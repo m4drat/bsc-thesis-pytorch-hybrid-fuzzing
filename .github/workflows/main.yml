@@ -19,6 +19,7 @@ jobs:
           root_file: thesis.aux
           working_directory: thesis-src
           compiler: bibtex
+          args: 
       - name: pdflatex main
         uses: dante-ev/latex-action@latest
         with:
