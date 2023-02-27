@@ -1,0 +1,1 @@
+{"rule":"ALLOW_TO","sentence":"^\\QDebug information allows to find precise boundaries for a lot of different types of memory accesses.\\E$"}

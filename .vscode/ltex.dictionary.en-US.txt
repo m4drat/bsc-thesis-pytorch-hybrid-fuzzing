@@ -1,3 +1,9 @@
 GAN
 Larionov-Trichkine
 Arsenij
+USENIX
+WOOT
+fuzzers
+Fuzzolic
+Sydr
+Superion

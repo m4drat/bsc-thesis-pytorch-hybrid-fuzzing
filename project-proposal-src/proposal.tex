@@ -1,41 +1,52 @@
 \documentclass[conference]{IEEEtran}
 
+\usepackage[pdftex]{graphicx}
+\graphicspath{{./assets}{../jpeg/}}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 
-  	\usepackage[pdftex]{graphicx}
-  	\graphicspath{{./assets}{../jpeg/}}
-	\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\usepackage[cmex10]{amsmath}
+\usepackage{mathabx}
+\usepackage{algorithmic}
+\usepackage{array}
+\usepackage{mdwmath}
+\usepackage{mdwtab}
+\usepackage{eqparbox}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{lstfiracode}
+\usepackage{xcolor}
 
-	\usepackage[cmex10]{amsmath}
-	\usepackage{mathabx}
-	\usepackage{algorithmic}
-	\usepackage{array}
-	\usepackage{mdwmath}
-	\usepackage{mdwtab}
-	\usepackage{eqparbox}
-	\usepackage{url}
-	\hyphenation{op-tical net-works semi-conduc-tor}
-
-
+\lstset{basicstyle=\ttfamily}
 \begin{document}
 
-\title{\LARGE Modeling of Trap Induced Dispersion of Large Signal Dynamic Characteristics of GaN HEMTs}
+\title{Utilizing debug information to improve error-finding methods in the context of hybrid fuzzing}
 
-% \author{\authorblockN{Leave Author List blank for your IMS2013 Summary (initial) submission.\\ IMS2013 will be rigorously enforcing the new double-blind reviewing requirements.}
-% \authorblockA{\IEEEauthorrefmark{1}Leave Affiliation List blank for your Summary (initial) submission}}
-
-\author{\IEEEauthorblockN{O. Jardel\IEEEauthorrefmark{1}, S. Laurent\IEEEauthorrefmark{2}, T. Reveyrand\IEEEauthorrefmark{2}, R. Qu\'{e}r\'{e}\IEEEauthorrefmark{2}, P. Nakkala\IEEEauthorrefmark{2}, A. Martin\IEEEauthorrefmark{2}\\ S. Piotrowicz\IEEEauthorrefmark{1}, M. Campovecchio\IEEEauthorrefmark{2}, S.L. Delage\IEEEauthorrefmark{1} }
-\IEEEauthorblockA{\IEEEauthorrefmark{1}III-V Lab, route de Nozay, 91461 Marcoussis Cedex, France}
-\IEEEauthorblockA{\IEEEauthorrefmark{2}XLIM, 7 rue Jules Valles, 19100 Brive-la-gaillarde, France\\olivier.jardel@3-5lab.fr}}
+\author{
+    \IEEEauthorblockN{
+        Larionov-Trichkine Theodor Arsenij
+    }
+    \IEEEauthorblockA{
+        Information Security\\National Research University "Higher School of Economics"\\Moscow, Russia
+    }
+    tlarionovtrishkin@edu.hse.ru
+}
 
 \maketitle
 
 \begin{abstract}
-    We propose here a non-linear GaN HEMT model for CAD including a trapping effects description consistent with both small-signal and large-signal operating modes. It takes into account the dynamics of the traps and then allows to accurately model the modulated large signal characteristics that are encountered in telecommunication and radar signals. This model is elaborated through low-frequency S-parameter measurements complementary to more classical pulsed-IV characterizations. A 8x75$\mu$m AlInN/GaN HEMT model was designed and particularly validated in large-signal pulsed RF operation. It is also shown that thermal and trapping effects have opposite effects on the output conductance, thus opening the way for separate characterizations of the two effects.
+    The use of fuzzing as a technique for identifying software vulnerabilities has become increasingly popular in recent years. While traditional fuzzing methods can be effective, they are inherently limited in their ability to find certain types of errors.
+
+    Hybrid fuzzing tries to overcome these limitations by leveraging the power of symbolic execution to generate inputs that can explore different paths in a program. However, the effectiveness of hybrid fuzzing can be hindered by imprecise boundaries calculations for symbolic memory accesses. This research project aims to address this issue by utilizing debug information to improve error-finding methods in the context of hybrid fuzzing.
+
+    The core idea of the project is to enhance the calculation of boundaries for symbolic memory accesses by leveraging debug information. With more accurate boundaries, local out-of-bounds bugs can be identified, and overall performance can be improved. The research will explore the feasibility of using debug information for boundaries calculation in the context of hybrid fuzzing and evaluate its effectiveness.
+
+    The project's methodology will involve implementing and testing the proposed approach on several open-source software projects. The results of this research will provide insights into the potential of using debug information to enhance hybrid fuzzing and could pave the way for more effective techniques in identifying software vulnerabilities.
 \end{abstract}
 
 \IEEEoverridecommandlockouts
 \begin{IEEEkeywords}
-    Trappings effects, thermal effects, low frequency S-parameters, CAD non-linear model, RF pulsed operation.
+    Hybrid fuzzing, symbolic execution, symbolic pointers, symbolic addresses, symbolic memory model, debug information, error-finding, software security testing.
 \end{IEEEkeywords}
 
 \IEEEpeerreviewmaketitle
@@ -46,88 +57,76 @@
 % ===================
 
 \section{Introduction}
-Gallium Nitride (GaN) High Electron Mobility Transistors (HEMT) on SiC are now recognized as good candidates for the development of a number of RF applications and notably Power Amplifiers (PA) for telecommunications and radars, due to their high breakdown voltage, their high cut-off frequency as well as their high temperature capabilities. However they are still subject to parasitics effects such as thermal effects and especially trapping effects. Those trapping effects have been extensively studied using a number of techniques such as pulsed measurements, load-pull measurements as well as frequency dispersion measurements. At the same time, models have been proposed that take those effects into account \cite{5296056, Leoni2001, 5516843}, and while the effects of traps are well taken into account in CW conditions, their impacts on dynamic large signal characteristics remain difficult to understand. They manifest themselves under modulated signals such as RF pulses or telecommunications signals. Memory effects are the main consequence of those trapping effects. In this paper we propose to investigate the dynamics of those trapping effects using large signal pulsed load pull measurements as well as low frequency dispersion measurements. It will be shown that a consistent nonlinear model can be obtained that allows to describe the full dynamic behavior of GaN transistors. The paper is organized as follows: Section II describes the theoretical impact of traps on the average current obtained under pulsed load pull conditions. Section III presents the measurements performed on an AlInN/GaN 8x75$\mu m$ HEMT and the results obtained using a large signal nonlinear electrothermal model taking into account the dynamics of the traps. Finally we conclude and draw some perspectives.
+With the rapid development of information technologies, the number and complexity of software systems have increased drastically. This has led to an increase in the number of software vulnerabilities as well as an increasing need for secure software development practices.
+
+One area of concern in software security is memory safety, particularly in the context of programming languages. Memory-unsafe languages, such as C and C++, are known to impose significant vulnerabilities due to their low-level nature and lack of automatic memory management \cite{chromium-project-memory-safety, android-project-memory-safety}. These vulnerabilities can range from buffer overflows to use-after-frees and beyond, and often lead to full system compromise.
+
+In order to address these issues, a variety of techniques have been developed, including static and dynamic analysis. While static analysis is a powerful tool for identifying vulnerabilities, it has its limitations. To complement static analysis and improve the overall effectiveness of vulnerability detection, dynamic analysis techniques emerged.
+
+Dynamic analysis often referred to as fuzzing, involves an automated generation of input data to test the behavior of a program at runtime.
+
+The field of fuzzing has been actively developing for years, and nowadays, there is a variety of fuzzing techniques and tools available:
+
+\begin{itemize}
+    \item AFL++~\cite{AFLplusplus-Woot20} is a popular fuzzing tool that uses a genetic algorithm and coverage feedback to generate new inputs.
+    \item Superion~\cite{superion-grammar-fuzzer} and Nautilus~\cite{nautilus-grammar-fuzzer} are grammar-based fuzzers that use hand-crafted grammar to generate inputs with a specific structure.
+    \item Sydr~\cite{sydr-cutting-edge-dynamic-symbolic-execution} and Fuzzolic~\cite{fuzzolic-hybrid-fuzzer} are examples of hybrid fuzzers that combine the power of symbolic execution with the speed of fuzzing.
+\end{itemize}
+
+All approaches are feasible, however, some of them require additional resources and time. That's where hybrid fuzzing shines. By using symbolic execution, it can generate structurally correct inputs that can explore different paths in a program without requiring any additional effort from the user.
+
+Consider the following example:
+
+\begin{lstlisting}[caption={Example solvable by hybrid fuzzing},label={lst:example1},language=C, basicstyle=\small\ttfamily, numbers=left, xleftmargin=2em, breaklines=true, captionpos=b]
+void vuln(int key) {
+    if (key * 0x142a2d == 0xdeadbeef) {
+        error();
+    }
+}
+\end{lstlisting}
 
 
-% =======================================================
-% # II. Impact of traps on large signal characteristics #
-% =======================================================
+With traditional fuzzing, it is almost impossible to randomly generate an input that will trigger the error in example \ref{lst:example1}. However, hybrid fuzzing methods allow us to generate a crash input by building a symbolic expression that represents the original input and then solving the constraints. This approach helps to overcome the limitations of traditional fuzzing and can be used to find a variety of bugs.
 
-\section{Impact of traps on large signal characteristics}
-One convenient way to identify the impact of trapping effects is to monitor the average drain current of the transistor versus an increasing RF input power. It has already been reportedbegin in \cite{5296056} and \cite{5516843} that this drain current under class-AB conditions decreases as the input power increases, contradicting the expected characteristics. Clearly this behavior cannot be explained by thermal behavior as far as the channel temperature sinks when the power increases and would leads, at least for moderate powers, to an average drain current enlargement.
+A hybrid fuzzing tool that I'm going to work with in this research is Sydr~\cite{sydr-cutting-edge-dynamic-symbolic-execution}. Sydr is a dynamic symbolic execution engine based on Triton~\cite{saudel15} that is used to solve the programs' constraints and generate inputs that can explore new program states. Besides the ability to generate new inputs, Sydr also uses a novel technique called {"Security Predicates"}~\cite{symbolic-security-predicates} to purposefully trigger error conditions in a program under test.
 
-\begin{figure}[ht!] %!t
-    \centering
-    \includegraphics[width=3.5in]{Courant_2.pdf}
-    \caption{Representation of the mechanism induced by traps on the average drain current.}
-    \label{Courant_2}
-\end{figure}
+Sydr has a lot of features, and one of the most interesting ones is the ability to handle symbolic memory accesses, which in itself is a very complex task \cite{symbolic-pointers-reasoning}. This feature allows Sydr to model symbolic memory accesses and, as such, greatly improve the effectiveness of hybrid fuzzing. However, the current implementation of symbolic pointers is not perfect. Boundaries calculations for symbolic memory accesses are imprecise, which can lead to incorrect results and hinder the effectiveness of hybrid fuzzing.
 
-Pulsed RF measurements were performed under DC bias on  AlGaN/GaN and InAlN/GaN HEMTs of 8x75x0.25$\mu m^2$ for a large number of output loads. For all devices, we obtain the same shape of the average drain current which is shematized in Figure \ref{Courant_2}. The average current decrease is due to the trap capture, which increases alike to the gate and drain voltage excursions versus the input power for a CW measurement. Indeed, the number of ionized traps is roughly proportional to the maximum value of the drain-source voltage, because of the disymmetry of the capture and emission time constants \cite{163456}.  When the RF power is pulsed, the average drain current exhibits transients  corresponding to the capture and emission of traps. For example, if the RF input power is pulsed to 0dBm, the current decreases  within the pulse due to the capture of traps. At the end of the pulse, when the input power is switched-off, there is a discontinuity in the drain current corresponding to the amount of increase ($\Delta I_{D1}$) of the average drain current, which should have appeared in the absence of traps as shown in Figure \ref{Courant_2}. Then the captured carriers are re-emitted and the drain current recovers at its bias level. It can be seen that the emission time constant for emission remains in the ms range while the capture one is lower than 10$\mu s$.
+The goal of this research project is to improve the calculation of boundaries for symbolic memory accesses by leveraging debug information. Debug information allows to find precise boundaries for a lot of different types of memory accesses. For example, it can be used to find the exact size of local and global variables or heap objects. With more accurate boundaries, a few aspects of the Sydr can be improved:
+
+\begin{itemize}
+    \item The effectiveness of Security Predicates because, with more accurate boundaries, more types of bugs can be found (e.g. local out-of-bounds bugs).
+    \item The overall speed and accuracy, because smaller memory regions put less strain on an SMT-solver.
+\end{itemize}
+
+% In addition to that, support for symbolic pointers allows Sydr to detect some out-of-bounds bugs. 
+
+% =========================
+% # II. Literature review #
+% =========================
+
+\section{Literature review}
 
 
-% =============================================
-% # III. Modeling and consistency validations #
-% =============================================
+% ================
+% # III. Methods #
+% ================
 
-\section{Modeling and consistency validations}
+\section{Methods}
 
-A previous large signal model including a description of the trapping effects \cite{Jardel2007b} was able to the reproduce the dynamics of the trapping effects versus the swings of the command voltages $V_{gs}$ and $V_{ds}$, i.e. by extension versus the input power and the load impedances during CW load-pull measurements. This allowed hence modeling consistently the typical shape of the average current, leading to an important improvement of the model accuracy.
+% ===========================
+% # IV. Results anticipated #
+% ===========================
 
-For this study, a 8x75$\mu$m AlInN/GaN HEMT has been characterized and modeled. The transistor is processed on SiC substrate using 0.25$\mu$m T-Gates technology. More details on the technological process of this transistor are given in \cite{jardel2012first}.
-The model takes into account thermal, gate-lag and drain-lag effects, and a special care was taken on its accuracy for CW power performances prediction at 10GHz, for a nominal bias point $V_{ds}$=15 to 25V, $I_{ds}$=250mA/mm.
-Fig. \ref{LP} shows the measured CW RF power characteristics at 10.24 GHz of a transistor biased at $V_{ds}$=20V, $I_{ds}$=150mA.  It delivers, on the optimum load impedance $Z_{load}=20+j.18\Omega$ and exibit 4.8W/mm output power at 3.5dB of compression with a PAE of 46\% and an associated gain of 11.5dB.
-
-\begin{figure}[ht!] %!t
-    \centering
-    \includegraphics[width=3.5in]{FigureLP_ancien_mod.pdf}
-    \caption{Measurements (grey), modeling (blue) of the CW RF performances of a 8x75$\mu$m AlInN/GaN HEMT at 10.24GHz in class AB. $Z_{loadOPT} = (20+j.18) \Omega$.}
-    \label{LP}
-\end{figure}
-
-However, using this model, the transient dynamics of the average current during pulsed power RF measurements is not sufficient as was already observed in \cite{wamicon}.
-Even if the output current behavior, due to capture and release of charges by traps is consistent as both processes are taken into account, the amplitude of the discontinuity of the current (named $\Delta I_{D1}$ in Figure \ref{Courant_2}), observed at the moment when the RF signal is switched off, has not enough amplitude. This can be explained by the fact that the extraction of the drain-lag contribution from pulsed-IV measurements at different quiescent bias points is a too much rough method to provide a correct traps induced current dispersion, especially around the nominal bias point, which is moreover often at low current in amplifiers. This however allows to model enough precisely the IV characteristics in the area of the IV network where the current is high and the drain voltage is close to the knee voltage, and where the traps induced current dispersion limits the RF load lines swing under RF power drive. This explains the good capability of the previous model to fit RF power characteristics despite the use of pulsed IV networks to model the lag correction terms.
-
-We propose here to use low-frequency S-parameters measurements \cite{elrafei} instead or in addition to pulsed IV measurements, which represent a far more precise and convenient method to extract the drain-lag contribution in the transistors non-linear models. Precise because the S-parameters do not provide the current, but directly its derivative. The output conductance is expressed by $g_d=\Re \left\{Y(2,2)\right\}$. $g_d$ is very sensitive to the drain-lag trapping effects, in the frequency range of the emission time constants of these traps.
-
-Convenient because the variations of the output conductance also provide the detrapping and thermal time constants, and give the ability to separate both effects, which induce opposite $g_d$ variations. However, traps time constants are particularly dependent on the electric fields and the temperature conditions (i.e. the measurement bias point), and these variations are not taken into account in the drain-lag model for the moment. Thus, the modeled traps time constants are fixed at the values measured with low frequency S-parameters at the nominal bias point of the application.
-
-The amplitude of the correction term is also determined from the same measurement, at the nominal bias point, in order to get the correct dispersion level in pulsed RF case, when RF is switched off and the transistor goes back to its nominal bias point. This however highlighted an imprecision of the previous model, in which the dispersion correction term was added to the command voltage vgs. Indeed, the fit of the output conductance dispersion induced by trapping effects leaded to a too high level of dispersion at high current, i.e. where the RF signal swings during power RF operation, thus inducing too much power slump in such cases. The model has been modified in order to add this correction term to the pinch-off voltage ($v_p$) formulation and also to the parameter $I_{DSS}$ (determining the steady state current) into the current source equations. Both contributions are written in order to conserve the proportionality relationship between $v_p$ and $I_{DSS}$. It allows to get a more precise dependence of the dispersion versus the current Ids delivered by the current source.
-
-\begin{figure}[ht!] %!t
-    \centering
-    \includegraphics[width=3.0in]{Compare_S.pdf}
-    \caption{$\Re\{Y_{22}\}$ and $\Im\{Y_{22}\}$. AlInN/GaN 8x75 $\mu m$ HEMT measurements at $V_{ds}=20V$, $I_{ds}=120mA$ (grey) are compared to a simple eletro-thermal model (red) and an eleectro-thermal model including activated drain-lag effects (blue)}
-    \label{Compare_S}
-\end{figure}
-
-A low-frequency S-parameters comparison between measurements and simulation at $V_{ds}$=20V, $I_{ds}$=200mA/mm is presented at Figure \ref{Compare_S}. The measurements have been performed between 5Hz and 500MHz in order to capture all the variations range of the thermal and trapping effects.
-
-We can observe two main traps having emission time constants leading to an increase of gd in the range of 2kHz-8kHz and 20kHz-1MHz, respectively. Thermal effects induce a decrease of the output conductance. The thermal model was determined from a three-dimensional finite element (3D-FE) simulation, and in order to take into account the distribution of the time constants, five RC-cells (i.e. five time constants) are necessary. However, the thermal contribution on the output conductance is quite negligible, as can be seen on the red curve that corresponds to the model with thermal effects only (trapping effects are desactivated).
-
-The imaginary part of $Y(2,2)$ is also presented, and a good agreement between the measurements and the simulations with this non-linear electrothermal model can also be observed. One can see that this imaginary part exhibits two maxima, which correspond to two kinds of drain-lag inducing traps. Thus this kind of measurement provides a convenient way to identify various types of traps in the transistor.
-
-\begin{figure}[ht!] %!t
-    \centering
-    \includegraphics[width=3.0in]{Compare_pulse.pdf}
-    \caption{Measurements (grey) and modeling (blue) of the average output current in pulsed RF signal operation at 10 GHz (5$\mu$s-100$\mu$s) with DC bias (20V, 115 mA). The amplitude of the transcient induced by detrapping when RF is switched off is accurately modeled.}
-    \label{Compare_pulse}
-\end{figure}
-
-Figure \ref{Compare_pulse} shows a comparison between RF pulsed measurements and simulations with this model. The transistor is measured at Vds0=20V, Ids0=115mA (190mA/mm), on a load impedance $Z_{load}=\left(20+j18\right)\Omega$. The bias voltages are continuous, and the RF signal, at a frequency of 10GHz, is pulsed. Its duration is 5$\mu s$, and its period 100$\mu s$. On this example, the RF imput power equals 20dBm, corresponding approximately to 1dB of gain compression. The very large amplitude of the current discontinuity at the moment when RF is switched off leads to a transient current from 97mA to 115mA (i.e. the nominal bias point).
-
-Envelope-transient simulations show the modeled output current, and the model enhanced capability to reproduce both the current discontinuity and the slow transient due to traps emission. The emission time constants are however not very accurate, and this can be due by the strong non-linearity of traps time constants versus bias and temperature, as explained previously.
-
+\section{Anticipated results}
 
 % ==================
-% # IV. CONCLUSION #
+% # V. CONCLUSION #
 % ==================
 
 \section{Conclusion}
-This work shows the importance of an accurate modeling of trapping effects in GaN HEMTs when they are used in large signal dynamic operation. An existing version of non-linear model including trapping effects has been improved in order to give better consistency between the dispersion effects around the nominal bias point and in the high $I_{ds}$-low $V_{ds}$ area, the first determining the model accuracy when the RF is switched off during pulsed RF operation, the latter the model accuracy under CW operation, or when RF is on during RF pulsed operation.
 
-Further work will investigate the behavior of the model under other types of dynamic RF operation like two-tone characteristics, and also on the improvement of the dispersion amplitude and detrapping time constants accuracies over the whole IV characteristics by fitting low frequency S-parameters measured at several bias points.
-
+The software security field is constantly evolving, being in a state of race between security researchers and hackers.
 
 % ==================
 % # ACKNOWLEDGMENTS #
