@@ -39,7 +39,7 @@
 
     Hybrid fuzzing tries to overcome these limitations by leveraging the power of symbolic execution to generate inputs that can explore different paths in a program. However, the effectiveness of hybrid fuzzing can be hindered by imprecise boundaries calculations for symbolic memory accesses. This research project aims to address this issue by utilizing debug information to improve error-finding methods in the context of hybrid fuzzing.
 
-    The core idea of the project is to enhance the calculation of boundaries for symbolic memory accesses by leveraging debug information. With more accurate boundaries, local out-of-bounds bugs can be identified, and overall performance can be improved. The research will explore the feasibility of using debug information for boundaries calculation in the context of hybrid fuzzing and evaluate its effectiveness.
+    The core idea of the project is to enhance the calculation of boundaries for symbolic memory accesses by leveraging debug information. With more accurate boundaries, previously undiscovered bugs can be identified, and overall performance can be improved. The research will explore the feasibility of using debug information for boundaries calculation in the context of hybrid fuzzing and evaluate its effectiveness.
 
     The project's methodology will involve implementing and testing the proposed approach on several open-source software projects. The results of this research will provide insights into the potential of using debug information to enhance hybrid fuzzing and could pave the way for more effective techniques in identifying software vulnerabilities.
 \end{abstract}
@@ -90,13 +90,35 @@ With traditional fuzzing, it is almost impossible to randomly generate an input 
 
 A hybrid fuzzing tool that I'm going to work with in this research is Sydr~\cite{sydr-cutting-edge-dynamic-symbolic-execution}. Sydr is a dynamic symbolic execution engine based on Triton~\cite{saudel15} that is used to solve the programs' constraints and generate inputs that can explore new program states. Besides the ability to generate new inputs, Sydr also uses a novel technique called {"Security Predicates"}~\cite{symbolic-security-predicates} to purposefully trigger error conditions in a program under test.
 
-Sydr has a lot of features, and one of the most interesting ones is the ability to handle symbolic memory accesses, which in itself is a very complex task \cite{symbolic-pointers-reasoning}. This feature allows Sydr to model symbolic memory accesses and, as such, greatly improve the effectiveness of hybrid fuzzing. However, the current implementation of symbolic pointers is not perfect. Boundaries calculations for symbolic memory accesses are imprecise, which can lead to incorrect results and hinder the effectiveness of hybrid fuzzing.
+Sydr has a lot of features, and one of the most interesting ones is the ability to handle symbolic memory accesses. This feature allows Sydr to model symbolic accesses to memory and, as such, greatly improve the effectiveness of hybrid fuzzing. Consider the following example:
 
-The goal of this research project is to improve the calculation of boundaries for symbolic memory accesses by leveraging debug information. Debug information allows to find precise boundaries for a lot of different types of memory accesses. For example, it can be used to find the exact size of local and global variables or heap objects. With more accurate boundaries, a few aspects of the Sydr can be improved:
+\begin{lstlisting}[caption={Access to memory via a symbolic pointer},label={lst:example2},language=C, basicstyle=\small\ttfamily, numbers=left, xleftmargin=2em, breaklines=true, captionpos=b]
+uint16_t crc_ibm_table[256] = { 
+    0x0000, 0xc0c1, 0xc181, 0x0140, ...
+};
+
+uint16_t
+crc_ibm_byte(uint16_t crc, const uint8_t c)
+{
+    uint8_t sym_idx = (crc ^ c) & 0xFF;
+    return crc_ibm_table[sym_idx] ^ 
+        (crc >> 8);
+}
+
+if (crc_ibm_byte(0, buf[0]) == 0x1337) {
+    error();
+}
+\end{lstlisting}
+
+In the example \ref{lst:example2}, the program accesses memory via a symbolic pointer while calculating the checksum for a user-provided data \textbf{buf}. This means that the value of a symbolic pointer/index \textbf{sym\_idx} depends on the input data. As a result, the program can access any element inside the \textbf{crc\_ibm\_table} array and this relation should be taken into account when building a symbolic expression for the program's constraints. Without correctly describing the memory access, the symbolic execution engine will not be able to generate an input that will lead to the error condition on line 14.
+
+Current implementation of the symbolic memory model in Sydr is described in the paper: \cite{symbolic-pointers-reasoning}. It proposes a wide range of novel techniques to handle symbolic memory accesses. However, it still has a lot of room for improvement. For example, the current implementation of symbolic pointers uses a simple heuristic to determine the boundaries for a symbolic memory access. However, this heuristic is not always accurate and might lead to incorrect results. Which in turn can hinder the effectiveness of hybrid fuzzing.
+
+The aim of this research project is to enhance the computation of symbolic memory access boundaries through the utilization of debug information. Debug information enables the identification of precise boundaries for various memory access types, such as local and global variables or heap objects. By obtaining more accurate boundaries, the Sydr can be improved in several ways:
 
 \begin{itemize}
-    \item The effectiveness of Security Predicates because, with more accurate boundaries, more types of bugs can be found (e.g. local out-of-bounds bugs).
-    \item The overall speed and accuracy, because smaller memory regions put less strain on an SMT-solver.
+    \item The effectiveness of Security Predicates can be enhanced as a result of the ability to detect additional types of bugs, such as local out-of-bounds bugs.
+    \item The overall speed and accuracy of the Sydr can be improved since smaller memory regions exert less pressure on an SMT-solver.
 \end{itemize}
 
 % In addition to that, support for symbolic pointers allows Sydr to detect some out-of-bounds bugs. 
@@ -107,6 +129,17 @@ The goal of this research project is to improve the calculation of boundaries fo
 
 \section{Literature review}
 
+As was already mentioned, the support for indirect memory dependencies is a crucial feature for any effective hybrid fuzzing tool. There are several approaches to handle symbolic memory accesses, and each of them has its own pros and cons. In this section, I will briefly describe the most popular approaches to model symbolic memory and in particular how to calculate the boundaries for symbolic pointers.
+
+The problem of precise boundaries computation for symbolic memory is not new. First mentions and some approaches were mentioned in the KLEE paper from 2008 \cite{symbolic-pointers-reasoning}. Since then, a lot of research has been done in this area, and the problem has been studied from different perspectives. In this section, I will briefly describe the most relevant approaches to symbolic pointers.
+
+3 MEMORY MODEL \cite{a-survey-of-symbolic-execution-techniques}
+
+V. INDEX-BASED MEMORY MODELING \cite{unleashing-mayhem-on-binary-code}
+
+A. Boundaries Approximation \cite{symbolic-pointers-reasoning}
+
+\cite{KLEE-OSDI-2008}
 
 % ================
 % # III. Methods #
@@ -114,11 +147,50 @@ The goal of this research project is to improve the calculation of boundaries fo
 
 \section{Methods}
 
+\begin{enumerate}
+    \item Debug info
+    \item Heap metadata
+\end{enumerate}
+
+Experiments:
+
+\begin{equation*}
+    \begin{aligned}
+        \text{Acc}_i= | \lbrack \text{Begin}_\text{default}, \text{End}_\text{default} \rbrack | - \\
+        {|\lbrack \text{Begin}_\text{dbg}, \text{End}_\text{dbg}\rbrack|} \bigcap                  \\
+        {\lbrack \text{Begin}_\text{default}, \text{End}_\text{default} \rbrack|}
+    \end{aligned}
+\end{equation*}
+
+\begin{equation}
+    \text{Acc}=\frac{\sum_{i=1}^n{\text{Acc}_i}}{n}
+\end{equation}
+
+\begin{equation}
+    \text{Error}_\text{left}=\frac{\sum_{i=1}^n{|\text{LeftDbg}_i-\text{LeftDefault}_i|}}{n}
+\end{equation}
+
+\begin{equation}
+    \text{Error}_\text{right}=\frac{\sum_{i=1}^n{|\text{RightDbg}_i-\text{RightDefault}_i|}}{n}
+\end{equation}
+
 % ===========================
 % # IV. Results anticipated #
 % ===========================
 
 \section{Anticipated results}
+
+The results anticipated are based on already implemented techniques and the outcomes of preliminary experiments, as well as analysis of the existing literature. The following improvements are expected:
+
+\begin{itemize}
+    \item Enable more precise computation of symbolic memory access boundaries.
+    \item The effectiveness of Security Predicates will be enhanced as a result of the ability to detect additional types of bugs, such as local out-of-bounds bugs.
+    \item The overall speed and accuracy of the Sydr can be improved since smaller memory regions exert less pressure on an SMT-solver.
+\end{itemize}
+
+It should be noted, that some of the anticipated results are already achieved, but were not thoroughly evaluated or implemented. For example, a fragment of the proposed technique is already implemented as a part of the Sydr's Security Predicates and allows to detect local out-of-bounds bugs.
+
+Eventually, after the final implementation of the proposed approach will be completed, the effectiveness of the Sydr will be evaluated on a set of real-world programs. The results will be presented in the final report.
 
 % ==================
 % # V. CONCLUSION #
@@ -126,7 +198,29 @@ The goal of this research project is to improve the calculation of boundaries fo
 
 \section{Conclusion}
 
-The software security field is constantly evolving, being in a state of race between security researchers and hackers.
+The software security field is constantly evolving, being in a state of race between security researchers and hackers. Therefore, it's important to always stay up-to-date and detect new vulnerabilities before they are exploited.
+
+In this paper we presented an approach to greatly improve capabilities of hybrid fuzzing tool Sydr by utilizing debug information. We not only proposed a new technique to compute symbolic memory access boundaries, but also implemented it and evaluated its effectiveness.
+
+It should be noted that the proposed approach has several notable advantages over the existing techniques:
+\begin{itemize}
+    \item It greatly improves the accuracy of symbolic memory access boundaries calculation compared to heuristic and constant offset approaches.
+    \item The performance of the method is remarkably better compared to the SMT-based approaches.
+\end{itemize}
+
+These enhancements promise a significant boost in the efficacy of error-detection methodologies, ultimately resulting in a reduction of exploitable vulnerabilities in the wild.
+
+\vspace{0.2cm}
+
+Further work on this topic can be done in several directions:
+
+\begin{itemize}
+    \item Use debug information to find types of integers (signed/unsigned). With this information, it is possible to improve some aspects of "Security Predicates" feature.
+    \item Add support for recursive structure parsing. This will allow us to detect more bugs, such as out-of-bounds accesses inside structures. Besides, it will refine boundaries for symbolic pointers.
+    \item Add better support for C++. Parse classes and their fields.
+    \item Improve support for optimized builds by expanding the range of locations that can be processed. In addition to single-address or base-pointer offset location descriptions, it is possible to use more complex expressions, such as stack-pointer offsets.
+    \item Use known structure of an object to further optimize formulas for the SMT-solver.
+\end{itemize}
 
 % ==================
 % # ACKNOWLEDGMENTS #
