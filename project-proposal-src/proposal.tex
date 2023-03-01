@@ -62,7 +62,7 @@ With the rapid development of information technologies, the number and complexit
 
 One area of concern in software security is memory safety, particularly in the context of programming languages. Memory-unsafe languages, such as C and C++, are known to impose significant vulnerabilities due to their low-level nature and lack of automatic memory management \cite{chromium-project-memory-safety, android-project-memory-safety}. These vulnerabilities can range from buffer overflows to use-after-frees and beyond, and often lead to full system compromise.
 
-In order to address these issues, a variety of techniques have been developed, including static and dynamic analysis. While static analysis is a powerful tool for identifying vulnerabilities, it has its limitations. To complement static analysis and improve the overall effectiveness of vulnerability detection, dynamic analysis techniques emerged.
+To address these issues, a variety of techniques have been developed, including static and dynamic analysis. While static analysis is a powerful tool for identifying vulnerabilities, it has its limitations. To complement static analysis and improve the overall effectiveness of vulnerability detection, dynamic analysis techniques emerged.
 
 Dynamic analysis often referred to as fuzzing, involves an automated generation of input data to test the behavior of a program at runtime.
 
@@ -87,7 +87,7 @@ void vuln(int key) {
 \end{lstlisting}
 
 
-With traditional fuzzing, it is almost impossible to randomly generate an input that will trigger the error in example \ref{lst:example1}. However, hybrid fuzzing methods allow us to generate a crash input by building a symbolic expression that represents the original input and then solving the constraints. This approach helps to overcome the limitations of traditional fuzzing and can be used to find a variety of bugs.
+With traditional fuzzing, it is almost impossible to randomly generate an input that will trigger the error in the example \ref{lst:example1}. However, hybrid fuzzing methods allow us to generate a crash input by building a symbolic expression that represents the original input and then solving the constraints. This approach helps to overcome the limitations of traditional fuzzing and can be used to find a variety of bugs.
 
 A hybrid fuzzing tool that I'm going to work with in this research is Sydr~\cite{sydr-cutting-edge-dynamic-symbolic-execution}. Sydr is a dynamic symbolic execution engine based on Triton~\cite{saudel15} that is used to solve the programs' constraints and generate inputs that can explore new program states. Besides the ability to generate new inputs, Sydr also uses a novel technique called {"Security Predicates"}~\cite{symbolic-security-predicates} to purposefully trigger error conditions in a program under test.
 
@@ -113,9 +113,9 @@ if (crc_ibm_byte(0, buf[0]) == 0x1337) {
 
 In the example \ref{lst:example2}, the program accesses memory via a symbolic pointer while calculating the checksum for a user-provided data \textbf{buf}. This means that the value of a symbolic pointer/index \textbf{sym\_idx} depends on the input data. As a result, the program can access any element inside the \textbf{crc\_ibm\_table} array and this relation should be taken into account when building a symbolic expression for the program's constraints. Without correctly describing the memory access, the symbolic execution engine will not be able to generate an input that will lead to the error condition on line 14.
 
-Current implementation of the symbolic memory model in Sydr is described in the paper: "Towards Symbolic Pointers Reasoning in Dynamic Symbolic Execution" \cite{symbolic-pointers-reasoning}. It proposes a wide range of novel techniques to handle symbolic memory accesses. However, it still has room for improvements. For example, the current implementation of symbolic pointers uses a simple heuristic to determine the boundaries for a symbolic memory access. However, this heuristic is not always accurate and might lead to incorrect results. Which in turn can hinder the effectiveness of hybrid fuzzing.
+The current implementation of the symbolic memory model in Sydr is described in the paper: "Towards Symbolic Pointers Reasoning in Dynamic Symbolic Execution" \cite{symbolic-pointers-reasoning}. It proposes a wide range of novel techniques to handle symbolic memory accesses. However, it still has room for improvement. For example, the current implementation of symbolic pointers uses a simple heuristic to determine the boundaries for symbolic memory access. However, this heuristic is not always accurate and might lead to incorrect results. Which in turn can hinder the effectiveness of hybrid fuzzing.
 
-The aim of this research project is to enhance the computation of symbolic memory access boundaries through the utilization of debug information. Debug information enables the identification of precise boundaries for various memory access types, such as local and global variables or heap objects. By obtaining more accurate boundaries, the Sydr can be improved in several ways:
+This research project aims to enhance the computation of symbolic memory access boundaries through the utilization of debug information. Debug information enables the identification of precise boundaries for various memory access types, such as local and global variables or heap objects. By obtaining more accurate boundaries, the Sydr can be improved in several ways:
 
 \begin{itemize}
     \item The effectiveness of Security Predicates can be enhanced as a result of the ability to detect additional types of bugs, such as local out-of-bounds bugs.
@@ -132,18 +132,50 @@ The aim of this research project is to enhance the computation of symbolic memor
 
 As previously discussed, the ability to handle indirect memory dependencies is a crucial feature in any hybrid fuzzing tool's effectiveness. Enhancements in this area can result in significant improvements in overall performance. In the following section, I will provide a concise overview of the leading methods for modeling symbolic memory, with a particular emphasis on one of the most crucial aspects of symbolic memory modeling: calculating precise boundaries for symbolic memory accesses.
 
-The problem of precise boundaries calculation is not new and has been studied in the context of symbolic execution for a long time. While it might not
+\subsection{Problem statement}
 
-1. Problem of precise boundaries calculation
-2. Symbolic survey
-3. Mayhem's approach
-4. Sydr's approach
+The problem of precise boundaries calculation has been studied in the context of symbolic execution for a significant period of time. One of the key challenges in symbolic address reasoning is to determine the possible range of values that can be held by a symbolic address. To ensure accurate symbolic execution and avoid the loss of execution paths, it is crucial to identify the bounds that are closest to the actual ones. Failing to estimate the address range correctly can lead to imprecise symbolic execution and potential loss of execution paths. Conversely, an excessive address range can result in a larger symbolic expression for memory access, leading to higher memory consumption, increased SMT solver workload, and a decline in analysis performance.
 
-3 MEMORY MODEL \cite{a-survey-of-symbolic-execution-techniques}
+\subsection{Overview of the memory models}
 
-V. INDEX-BASED MEMORY MODELING \cite{unleashing-mayhem-on-binary-code}
+In a paper titled "A Survey of Symbolic Execution Techniques" \cite{a-survey-of-symbolic-execution-techniques}, the authors provide a comprehensive overview of state-of-the-art symbolic execution techniques. The paper discusses the various approaches to symbolic memory modeling and provides a detailed comparison of the most popular methods. They examine several different approaches to symbolic memory modeling, including the following:
 
-A. Boundaries Approximation \cite{symbolic-pointers-reasoning}
+\begin{itemize}
+    \item Fully symbolic memory with state forking
+    \item Fully symbolic memory modeled with ITE (if-then-else) formulas
+    \item Address concretization
+    \item Partial memory modeling
+    \item Lazy initialization
+\end{itemize}
+
+Each of these methods has its own advantages and disadvantages. For example, address concretization shows the best performance in terms of execution speed, but it is not suitable for programs that use a large number of symbolic pointers, as it can lead to a significant loss of execution paths. On the other hand, fully symbolic memory modeling is the most accurate method, but it is also the slowest one.
+
+\subsection{Mayhem's approach}
+
+Mayhem \cite{unleashing-mayhem-on-binary-code} uses a different approach to model symbolic memory. It introduces an index-based memory model where memory is represented as a map $ \mu : I \rightarrow E $ from 32-bit indices $ (i) $ to expressions $ (e) $. However, handling arbitrary symbolic indices is not always possible, as in general case a symbolic index can reference any memory location. That's why Mayhem uses a hybrid approach that models memory \textit{partially}, where write operations are always concretized, but read operations are symbolic. This approach allows Mayhem to handle a large number of symbolic pointers without losing too much performance.
+
+To effectively utilize this approach Mayhem uses \textit{memory objects}, which in most cases are significantly smaller than the entire memory $ \mu $. However, in order to implement this approach successfully, it is imperative to establish all potential values of a symbolic index $ i $. In essence, this requires determining the precise boundaries of each symbolic memory access. To achieve this, Mayhem uses a slightly inaccurate method involving the use of an SMT-solver to approximate the boundaries of symbolic memory accesses.
+
+This method shows manageable performance, however, it has several drawbacks:
+
+\begin{itemize}
+    \item Solver queries are expensive and for 32-bit symbolic pointer access, you might need to perform $ \approx 54 $ queries on average to determine both boundaries.
+    \item The accuracy is not always sufficient.
+\end{itemize}
+
+\subsection{Sydr's approach}
+
+The approach utilized by Sydr \cite{sydr-cutting-edge-dynamic-symbolic-execution} involves a distinct technique that employs an AST-based heuristic to infer the lower bound. This approach entails examining the AST of the address expression and identifying the concrete segment of the address to deduce a lower bound. This method is described in the paper: "Towards Symbolic Pointers Reasoning in Dynamic Symbolic Execution" \cite{symbolic-pointers-reasoning}.
+
+Consider an example with symbolic memory access: \texttt{mov ax, BYTE PTR [rdi + rsi * 0x4]}. Because the expression \texttt{rdi + rsi * 0x4} is symbolic, one of the operands (or all of them) must also be symbolic, in this case, it is \texttt{rsi}, the index for the array access. The heuristic algorithm will then analyze the AST of this expression and find the concrete part of the address, which is \texttt{rdi}. This part is then used as a lower bound.
+
+This method is quite effective and allows to determine the lower bound of symbolic memory access with a high degree of accuracy while being relatively fast. However, it has some drawbacks:
+
+\begin{itemize}
+    \item As the algorithm is based on the heuristic, it is not always possible to determine the lower bound.
+    \item The accuracy of the algorithm is not always sufficient.
+    \item And, probably the most significant drawback, is that the algorithm is not able to determine the upper bound, which substantially limits the opportunities for additional optimizations and improvements.
+\end{itemize}
 
 % ================
 % # III. Methods #
@@ -153,7 +185,7 @@ A. Boundaries Approximation \cite{symbolic-pointers-reasoning}
 
 To improve the computation of symbolic memory access boundaries, I propose to utilize debug information. Debug information is a set of metadata that is used to provide information about the program's source code. Often, this information can be used to find exact sizes and boundaries for various memory regions. For example, debug information can be used to determine the size of global and local variables or the size of a heap object.
 
-General outline of the algorithm to compute the boundaries can be described as follows:
+A general outline of the algorithm to compute the boundaries can be described as follows:
 
 \begin{algorithm}
     \KwData{mem\_access - memory access to be analyzed}
@@ -191,7 +223,7 @@ By utilizing this algorithm, we can significantly enhance the accuracy of bounda
 
 \subsection{Metrics}
 
-In order to showcase the efficacy of the proposed approach, a series of preliminary experiments are underway. In assessing the ongoing enhancements, we are utilizing the following metrics:
+To showcase the efficacy of the proposed approach, a series of preliminary experiments are underway. In assessing the ongoing enhancements, we are utilizing the following metrics:
 
 \begin{equation}
     \begin{aligned}
@@ -203,10 +235,10 @@ In order to showcase the efficacy of the proposed approach, a series of prelimin
 
 \begin{equation}
     \label{eq:error}
-    \text{Err}=\frac{\sum_{i=1}^n{\text{Acc}_i}}{n}
+    \text{Err}=\frac{\sum_{i=1}^n{\text{Err}_i}}{n}
 \end{equation}
 
-Metric \ref{eq:error} is a measure of how well the boundaries computed by the proposed approach match the boundaries computed by the default approach. The error is calculated as a ratio between the size of the intersection of the two sets of boundaries and the size of the default boundaries set. Higher error value means that the proposed approach differs significantly from the default approach. In other words, the proposed approach is able to compute more precise boundaries for a memory access, as the debug information gives the ground truth.
+Metric \ref{eq:error} is a measure of how well the boundaries computed by the proposed approach match the boundaries computed by the default approach. The error is calculated as a ratio between the size of the intersection of the two sets of boundaries and the size of the default boundaries set. A higher error value means that the proposed approach differs significantly from the default approach. In other words, the proposed approach is able to compute more precise boundaries for a memory access, as the debug information gives the ground truth.
 
 \begin{equation}
     \label{eq:error_left}
@@ -218,16 +250,16 @@ Metric \ref{eq:error} is a measure of how well the boundaries computed by the pr
     \text{Error}_\text{right}=\frac{\sum_{i=1}^n{|\text{RightDbg}_i-\text{RightDefault}_i|}}{n}
 \end{equation}
 
-Left \ref{eq:error_left} and right \ref{eq:error_right} error are measures of how well the proposed approach is able to compute the left and right boundaries of a memory access on average. The error is calculated as a ratio between the sum of the absolute differences between the left and right boundaries computed by the proposed approach and the default approach. When error values are high, it indicates a considerable deviation from the default approach. This suggests that the proposed method offers more precise results.
+Left \ref{eq:error_left} and right \ref{eq:error_right} errors are measures of how well the proposed approach can compute the left and right boundaries of a memory access on average. The error is calculated as a ratio between the sum of the absolute differences between the left and right boundaries computed by the proposed approach and the default approach. When error values are high, it indicates a considerable deviation from the default approach. This suggests that the proposed method offers more precise results.
 
 With this set of metrics, the effectiveness of the new approach can be evaluated on a set of benchmarks. Besides the metrics, a few different aspects also can be taken into account:
 
 \begin{itemize}
-    \item Length of the formulas for the SMT solver to solve.
-    \item Overall performance.
-    \item Path accuracy.
-    \item Bug detection rate.
-    \item Fuzzbench benchmarks.
+    \item Length of the formulas for the SMT solver to solve
+    \item Overall performance
+    \item Path accuracy
+    \item Bug detection rate
+    \item FuzzBench \cite{FuzzBench} benchmarks
 \end{itemize}
 
 \subsection{Problems and limitations}
@@ -245,7 +277,7 @@ Also, worth noting that this approach can't work in a black-box mode, since it r
 
 The proposed approach in almost all cases can determine \textbf{the exact} boundaries for memory access without requiring any intensive computations. This is in contrast to the heuristic-based approach currently employed by Sydr, which is speedy but lacks accuracy and can't detect the upper boundary for memory access.
 
-It also wins compared to approach used by Mayhem \cite{unleashing-mayhem-on-binary-code}, which utilizes an SMT-solver to find lower and upper boundaries for a memory access, as it is significantly faster and more accurate.
+It also wins compared to the approach used by Mayhem \cite{unleashing-mayhem-on-binary-code}, which utilizes an SMT-solver to find lower and upper boundaries for a memory access, as it is significantly faster and more accurate.
 
 % ===========================
 % # IV. Results anticipated #
@@ -253,7 +285,7 @@ It also wins compared to approach used by Mayhem \cite{unleashing-mayhem-on-bina
 
 \section{Anticipated results}
 
-The results anticipated are based on already implemented techniques and the outcomes of preliminary experiments, as well as analysis of the existing literature. The following improvements are expected:
+The results anticipated are based on already implemented techniques and the outcomes of preliminary experiments, as well as an analysis of the existing literature. The following improvements are expected:
 
 \begin{itemize}
     \item Enable more precise computation of symbolic memory access boundaries.
@@ -273,7 +305,7 @@ Eventually, after the final implementation of the proposed approach will be comp
 
 The software security field is constantly evolving, being in a state of race between security researchers and hackers. Therefore, it's important to always stay up-to-date and detect new vulnerabilities before they are exploited.
 
-In this paper we presented an approach to greatly improve capabilities of hybrid fuzzing tool Sydr by utilizing debug information. We not only proposed a new technique to compute symbolic memory access boundaries, but also implemented it and evaluated its effectiveness.
+In this paper, we presented an approach to greatly improve the capabilities of the hybrid fuzzing tool Sydr by utilizing debug information. We not only proposed a new technique to compute symbolic memory access boundaries but also implemented it and developed a set of benchmarks to evaluate its effectiveness.
 
 It should be noted that the proposed approach has several notable advantages over the existing techniques:
 \begin{itemize}
@@ -288,11 +320,11 @@ These enhancements promise a significant boost in the efficacy of error-detectio
 Further work on this topic can be done in several directions:
 
 \begin{itemize}
-    \item Use debug information to find types of integers (signed/unsigned). With this information, it is possible to improve some aspects of "Security Predicates" feature.
+    \item Use debug information to find types of integers (signed/unsigned). With this information, it is possible to improve some aspects of the "Security Predicates" feature.
     \item Add support for recursive structure parsing. This will allow us to detect more bugs, such as out-of-bounds accesses inside structures. Besides, it will refine boundaries for symbolic pointers.
     \item Add better support for C++. Parse classes and their fields.
     \item Improve support for optimized builds by expanding the range of locations that can be processed. In addition to single-address or base-pointer offset location descriptions, it is possible to use more complex expressions, such as stack-pointer offsets.
-    \item Use known structure of an object to further optimize formulas for the SMT-solver.
+    \item Use the known structure of an object to further optimize formulas for the SMT-solver.
 \end{itemize}
 
 % ==================
@@ -310,5 +342,9 @@ Further work on this topic can be done in several directions:
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,bibliography}
+
+\vspace{0.5cm}
+
+Word count: 2563
 
 \end{document}

@@ -7,3 +7,4 @@ fuzzers
 Fuzzolic
 Sydr
 Superion
+FuzzBench
