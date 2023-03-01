@@ -16,6 +16,7 @@
 \usepackage{listings}
 \usepackage{lstfiracode}
 \usepackage{xcolor}
+\usepackage{algorithm2e}
 
 \lstset{basicstyle=\ttfamily}
 \begin{document}
@@ -37,7 +38,7 @@
 \begin{abstract}
     The use of fuzzing as a technique for identifying software vulnerabilities has become increasingly popular in recent years. While traditional fuzzing methods can be effective, they are inherently limited in their ability to find certain types of errors.
 
-    Hybrid fuzzing tries to overcome these limitations by leveraging the power of symbolic execution to generate inputs that can explore different paths in a program. However, the effectiveness of hybrid fuzzing can be hindered by imprecise boundaries calculations for symbolic memory accesses. This research project aims to address this issue by utilizing debug information to improve error-finding methods in the context of hybrid fuzzing.
+    Hybrid fuzzing tries to overcome these limitations by leveraging the power of symbolic execution to generate inputs that can explore different paths in a program. However, the effectiveness of hybrid fuzzing can be hindered by imprecise boundaries calculation for symbolic memory accesses. This research project aims to address this issue by utilizing debug information to improve error-finding methods in the context of hybrid fuzzing.
 
     The core idea of the project is to enhance the calculation of boundaries for symbolic memory accesses by leveraging debug information. With more accurate boundaries, previously undiscovered bugs can be identified, and overall performance can be improved. The research will explore the feasibility of using debug information for boundaries calculation in the context of hybrid fuzzing and evaluate its effectiveness.
 
@@ -112,7 +113,7 @@ if (crc_ibm_byte(0, buf[0]) == 0x1337) {
 
 In the example \ref{lst:example2}, the program accesses memory via a symbolic pointer while calculating the checksum for a user-provided data \textbf{buf}. This means that the value of a symbolic pointer/index \textbf{sym\_idx} depends on the input data. As a result, the program can access any element inside the \textbf{crc\_ibm\_table} array and this relation should be taken into account when building a symbolic expression for the program's constraints. Without correctly describing the memory access, the symbolic execution engine will not be able to generate an input that will lead to the error condition on line 14.
 
-Current implementation of the symbolic memory model in Sydr is described in the paper: \cite{symbolic-pointers-reasoning}. It proposes a wide range of novel techniques to handle symbolic memory accesses. However, it still has a lot of room for improvement. For example, the current implementation of symbolic pointers uses a simple heuristic to determine the boundaries for a symbolic memory access. However, this heuristic is not always accurate and might lead to incorrect results. Which in turn can hinder the effectiveness of hybrid fuzzing.
+Current implementation of the symbolic memory model in Sydr is described in the paper: "Towards Symbolic Pointers Reasoning in Dynamic Symbolic Execution" \cite{symbolic-pointers-reasoning}. It proposes a wide range of novel techniques to handle symbolic memory accesses. However, it still has room for improvements. For example, the current implementation of symbolic pointers uses a simple heuristic to determine the boundaries for a symbolic memory access. However, this heuristic is not always accurate and might lead to incorrect results. Which in turn can hinder the effectiveness of hybrid fuzzing.
 
 The aim of this research project is to enhance the computation of symbolic memory access boundaries through the utilization of debug information. Debug information enables the identification of precise boundaries for various memory access types, such as local and global variables or heap objects. By obtaining more accurate boundaries, the Sydr can be improved in several ways:
 
@@ -129,9 +130,14 @@ The aim of this research project is to enhance the computation of symbolic memor
 
 \section{Literature review}
 
-As was already mentioned, the support for indirect memory dependencies is a crucial feature for any effective hybrid fuzzing tool. There are several approaches to handle symbolic memory accesses, and each of them has its own pros and cons. In this section, I will briefly describe the most popular approaches to model symbolic memory and in particular how to calculate the boundaries for symbolic pointers.
+As previously discussed, the ability to handle indirect memory dependencies is a crucial feature in any hybrid fuzzing tool's effectiveness. Enhancements in this area can result in significant improvements in overall performance. In the following section, I will provide a concise overview of the leading methods for modeling symbolic memory, with a particular emphasis on one of the most crucial aspects of symbolic memory modeling: calculating precise boundaries for symbolic memory accesses.
 
-The problem of precise boundaries computation for symbolic memory is not new. First mentions and some approaches were mentioned in the KLEE paper from 2008 \cite{symbolic-pointers-reasoning}. Since then, a lot of research has been done in this area, and the problem has been studied from different perspectives. In this section, I will briefly describe the most relevant approaches to symbolic pointers.
+The problem of precise boundaries calculation is not new and has been studied in the context of symbolic execution for a long time. While it might not
+
+1. Problem of precise boundaries calculation
+2. Symbolic survey
+3. Mayhem's approach
+4. Sydr's approach
 
 3 MEMORY MODEL \cite{a-survey-of-symbolic-execution-techniques}
 
@@ -139,40 +145,107 @@ V. INDEX-BASED MEMORY MODELING \cite{unleashing-mayhem-on-binary-code}
 
 A. Boundaries Approximation \cite{symbolic-pointers-reasoning}
 
-\cite{KLEE-OSDI-2008}
-
 % ================
 % # III. Methods #
 % ================
 
 \section{Methods}
 
-\begin{enumerate}
-    \item Debug info
-    \item Heap metadata
-\end{enumerate}
+To improve the computation of symbolic memory access boundaries, I propose to utilize debug information. Debug information is a set of metadata that is used to provide information about the program's source code. Often, this information can be used to find exact sizes and boundaries for various memory regions. For example, debug information can be used to determine the size of global and local variables or the size of a heap object.
 
-Experiments:
+General outline of the algorithm to compute the boundaries can be described as follows:
 
-\begin{equation*}
+\begin{algorithm}
+    \KwData{mem\_access - memory access to be analyzed}
+    \KwData{left\_boundary - leftmost boundary of the memory access}
+    \KwData{right\_boundary - rightmost boundary of the memory access}
+    \KwResult{left\_boundary, right\_boundary}
+    $left\_boundary = 0$\;
+    $right\_boundary = 0$\;
+
+    \If{mem\_access is symbolic}{
+        \uIf{points to heap memory}{
+            $info \gets get\_chunk(mem\_access)$ \\
+        }
+        \uElseIf{points to global variable}
+        {
+            $info \gets get\_global(mem\_access)$ \\
+        }
+        \uElseIf{points to stack (local) variable}
+        {
+            $info \gets get\_local(mem\_access)$ \\
+        }
+        \uElse{
+            Use default method to approximate boundaries \\
+            $info.start \gets find\_base(mem\_access)$ \\
+            $info.start \gets info.start + offset$
+        }
+
+        $left\_boundary \gets info.start$ \\
+        $right\_boundary \gets info.end$
+    }
+    \caption{Outline of the algorithm to compute the boundaries for symbolic memory accesses}
+\end{algorithm}
+
+By utilizing this algorithm, we can significantly enhance the accuracy of boundaries calculation. This is achieved by avoiding the need for approximations in many cases, and instead relying on the precise values obtained from debug information.
+
+\subsection{Metrics}
+
+In order to showcase the efficacy of the proposed approach, a series of preliminary experiments are underway. In assessing the ongoing enhancements, we are utilizing the following metrics:
+
+\begin{equation}
     \begin{aligned}
-        \text{Acc}_i= | \lbrack \text{Begin}_\text{default}, \text{End}_\text{default} \rbrack | - \\
+        \text{Err}_i= | \lbrack \text{Begin}_\text{default}, \text{End}_\text{default} \rbrack | - \\
         {|\lbrack \text{Begin}_\text{dbg}, \text{End}_\text{dbg}\rbrack|} \bigcap                  \\
         {\lbrack \text{Begin}_\text{default}, \text{End}_\text{default} \rbrack|}
     \end{aligned}
-\end{equation*}
-
-\begin{equation}
-    \text{Acc}=\frac{\sum_{i=1}^n{\text{Acc}_i}}{n}
 \end{equation}
 
 \begin{equation}
+    \label{eq:error}
+    \text{Err}=\frac{\sum_{i=1}^n{\text{Acc}_i}}{n}
+\end{equation}
+
+Metric \ref{eq:error} is a measure of how well the boundaries computed by the proposed approach match the boundaries computed by the default approach. The error is calculated as a ratio between the size of the intersection of the two sets of boundaries and the size of the default boundaries set. Higher error value means that the proposed approach differs significantly from the default approach. In other words, the proposed approach is able to compute more precise boundaries for a memory access, as the debug information gives the ground truth.
+
+\begin{equation}
+    \label{eq:error_left}
     \text{Error}_\text{left}=\frac{\sum_{i=1}^n{|\text{LeftDbg}_i-\text{LeftDefault}_i|}}{n}
 \end{equation}
 
 \begin{equation}
+    \label{eq:error_right}
     \text{Error}_\text{right}=\frac{\sum_{i=1}^n{|\text{RightDbg}_i-\text{RightDefault}_i|}}{n}
 \end{equation}
+
+Left \ref{eq:error_left} and right \ref{eq:error_right} error are measures of how well the proposed approach is able to compute the left and right boundaries of a memory access on average. The error is calculated as a ratio between the sum of the absolute differences between the left and right boundaries computed by the proposed approach and the default approach. When error values are high, it indicates a considerable deviation from the default approach. This suggests that the proposed method offers more precise results.
+
+With this set of metrics, the effectiveness of the new approach can be evaluated on a set of benchmarks. Besides the metrics, a few different aspects also can be taken into account:
+
+\begin{itemize}
+    \item Length of the formulas for the SMT solver to solve.
+    \item Overall performance.
+    \item Path accuracy.
+    \item Bug detection rate.
+    \item Fuzzbench benchmarks.
+\end{itemize}
+
+\subsection{Problems and limitations}
+
+While implementing the proposed approach, several problems and limitations were discovered. The most significant of them are the following:
+
+\begin{itemize}
+    \item Location descriptions in debug information can be quite complex, which makes it difficult to extract the necessary information from them. This is especially a concern for highly optimized builds.
+    \item In multimodule programs, finding the required information can be problematic due to the lazy loading of debug information.
+\end{itemize}
+
+Also, worth noting that this approach can't work in a black-box mode, since it requires debug information to be available. This means that the proposed approach can be used only for the programs that were compiled with debug information. However, this is not a significant limitation, since we assume that the programs that are analyzed by Sydr are compiled with debug information.
+
+\subsection{Notable advantages}
+
+The proposed approach in almost all cases can determine \textbf{the exact} boundaries for memory access without requiring any intensive computations. This is in contrast to the heuristic-based approach currently employed by Sydr, which is speedy but lacks accuracy and can't detect the upper boundary for memory access.
+
+It also wins compared to approach used by Mayhem \cite{unleashing-mayhem-on-binary-code}, which utilizes an SMT-solver to find lower and upper boundaries for a memory access, as it is significantly faster and more accurate.
 
 % ===========================
 % # IV. Results anticipated #
