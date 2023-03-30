@@ -10,25 +10,25 @@ jobs:
         uses: dante-ev/latex-action@latest
         with:
           root_file: thesis.tex
-          working_directory: thesis-src
+          working_directory: thesis-src-pytorch-hybrid-fuzzing
           compiler: pdflatex
           args: -interaction=nonstopmode -shell-escape
       - name: bibtex main
         uses: dante-ev/latex-action@latest
         with:
           root_file: thesis.aux
-          working_directory: thesis-src
+          working_directory: thesis-src-pytorch-hybrid-fuzzing
           compiler: bibtex
-          args: 
+          args:
       - name: pdflatex main
         uses: dante-ev/latex-action@latest
         with:
           root_file: thesis.tex
-          working_directory: thesis-src
+          working_directory: thesis-src-pytorch-hybrid-fuzzing
           compiler: pdflatex
           args: -interaction=nonstopmode -shell-escape
       - name: Upload PDF file
         uses: actions/upload-artifact@v3
         with:
           name: PDF
-          path: thesis-src/thesis.pdf
+          path: thesis-src-pytorch-hybrid-fuzzing/thesis.pdf
