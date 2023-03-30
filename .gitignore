@@ -1,6 +1,7 @@
 # Custom gitignore rules
 docs/
 examples/
+experiments/
 
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:

@@ -1,6 +1,8 @@
-# B.Sc. thesis (2022)
+# B.Sc. thesis (2023)
 
-Theme: Utilization of debug information in the context of hybrid fuzzing to improve the accuracy of error detection methods
+Project proposal theme: Utilizing debug information to improve error-finding methods in the context of hybrid fuzzing
+
+Thesis theme: Hybrid Fuzzing of the PyTorch Framework
 
 ## Links
 
