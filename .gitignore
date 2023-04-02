@@ -1,7 +1,10 @@
 # Custom gitignore rules
 docs/
 examples/
-experiments/
+code-samples/
+
+# Ignore Sydr output directories
+*-tmp-out
 
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:

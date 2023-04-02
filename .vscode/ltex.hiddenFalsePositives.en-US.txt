@@ -1,1 +1,4 @@
 {"rule":"ALLOW_TO","sentence":"^\\QDebug information allows to find precise boundaries for a lot of different types of memory accesses.\\E$"}
+{"rule":"IN_THE_MEAN_TIME_PHRASE","sentence":"^\\Qmean time (ms) std (ms) min (ms) max (ms)\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q10 inf unk\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qyodl results\\E$"}
