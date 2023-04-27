@@ -32,18 +32,16 @@
 
 % add bibliography using biblatex
 % if if all authors in bibliography are needed => add 'maxbibnames=99' in []:
-\usepackage[backend=bibtex, citestyle=authoryear]{biblatex}
+\usepackage[backend=bibtex, citestyle=numeric]{biblatex}
 \addbibresource{bibliography.bib}
 \DeclareFieldFormat{labelnumberwidth}{#1\adddot}
 \setlength{\biblabelsep}{5pt}
- 
 
 \geometry{left=2.5cm} % left margin
 \geometry{right=1.5cm} % right margin
 \geometry{top=1.5cm} % top margin
 \geometry{bottom=1.5cm} % bottom margin
 \renewcommand{\baselinestretch}{1.5} % line spacing
-
 
 \renewcommand{\theenumi}{\arabic{enumi}} % Make all enumerations to be in form digit.digit
 \renewcommand{\labelenumi}{\arabic{enumi}}
@@ -73,58 +71,20 @@ Your annotation in English.
 }
 
 \section*{Keywords}
-NLP, CV, DL, ML, RL, GAN,
+Hybrid Fuzzing, Program Security, Dynamic Analysis, PyTorch, AI Frameworks Security
 \pagebreak
 
-\section{Introduction}
+\include{introduction.tex}
 
-\subsection{Citing}
+\include{hybrid-fuzzing.tex}
 
-In this template you have to insert all your references in a special file
-called "bibliography.bib". It should be inserted in a special BibTeX format.
-It can be found easily via Google Scholar -> quotation sign -> BibTeX. You can find how it looks in ".bib" file.
+\include{pytorch-fuzzing.tex}
 
-After you have inserted your BibTeX citation into the ".bib" file, you can cite it in this document using \cite{vaswani2017}.
+\include{hybrid-fuzzer-improvements.tex}
 
-Or you can cite it in the following way: \cite{kim2020code}.
+\include{results.tex}
 
-\subsection{Graphs}
-
-Graph \ref{fig:by_epochs} shows the results of the experiment.
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=1\textwidth]{graph2.png}
-	\caption{Graph sample}
-	\label{fig:by_epochs}
-\end{figure}
-
-\pagebreak
-
-\subsection{Tables}
-
-\begin{table}[htbp]
-	\caption{Table example}
-	\label{table:long_epochs}
-	\footnotesize
-	\centering
-	\begin{tabular}{lrrrrrrrr}
-		\toprule
-		              & \multicolumn{3}{c}{$\mathsf{Val}$} &
-		\multicolumn{3}{c}{$\mathsf{Test}$}                                                                                                                                              \\
-		\cmidrule(lr){2-4} \cmidrule(l){5-7}
-		{}            & $\mathsf{Prec}$                    & $\mathsf{Rec}$ & $\mathsf{F1}$ & $\mathsf{Prec}$ & $\mathsf{Rec}$ & $\mathsf{F1}$ & $\mathsf{nodes}$ & $\mathsf{subtokens}$ \\
-		\midrule
-		run \#1       & 0.4894                             & 0.3775         & 0.4263        & 0.4824          & 0.3683         & 0.4177        & 10029            & 179                  \\
-		run \#2       & 0.4887                             & 0.3739         & 0.4237        & 0.4891          & 0.3724         & 0.4228        & 10039            & 177                  \\
-		run \#3       & 0.4820                             & 0.3751         & 0.4219        & 0.4838          & 0.3677         & 0.4178        & 10037            & 180                  \\
-		\midrule
-		\bf{mean}     & \bf{0.4867}                        & \bf{0.3755}    & \bf{0.4239}   & \bf{ 0.4851}    & \bf{0.3695}    & \bf{0.4195}                                             \\
-		\bf{variance} & 0.0041                             & 0.0019         & 0.0022        & 0.0036          & 0.0025         & 0.0029                                                  \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
+\include{conclusion.tex}
 
 \newpage
 

@@ -8,3 +8,6 @@ Fuzzolic
 Sydr
 Superion
 FuzzBench
+fuzzer
+Fuzzer
+sydr-fuzz

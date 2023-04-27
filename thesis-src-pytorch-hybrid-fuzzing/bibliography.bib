@@ -1,13 +1,206 @@
-@article{vaswani2017,
-  title={Attention is all you need},
-  author={Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N and Kaiser, Lukasz and Polosukhin, Illia},
-  journal={arXiv preprint arXiv:1706.03762},
-  year={2017}
+@misc{chromium-project-memory-safety,
+  howpublished = {\url{https://www.chromium.org/Home/chromium-security/memory-safety/}},
+  title        = {Chromium project memory safety report},
+  note         = {Accessed: 2023-02-12}
 }
 
-@article{kim2020code,
-  title={Code prediction by feeding trees to transformers},
-  author={Kim, Seohyun and Zhao, Jinman and Tian, Yuchi and Chandra, Satish},
-  journal={arXiv preprint arXiv:2003.13848},
-  year={2020}
+@misc{android-project-memory-safety,
+  howpublished = {\url{https://source.android.com/docs/security/test/memory-safety}},
+  title        = {Android project memory safety report},
+  note         = {Accessed: 2023-02-13}
 }
+
+@misc{what-science-can-tell-us-about-c-and-c++-security,
+  howpublished = {\url{https://alexgaynor.net/2020/may/27/science-on-memory-unsafety-and-security/}},
+  title        = {What science can tell us about C and C++'s security},
+  note         = {Accessed: 2023-03-14}
+}
+
+@incollection{pytorch,
+  title     = {PyTorch: An Imperative Style, High-Performance Deep Learning Library},
+  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Kopf, Andreas and Yang, Edward and DeVito, Zachary and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
+  booktitle = {Advances in Neural Information Processing Systems 32},
+  pages     = {8024--8035},
+  year      = {2019},
+  publisher = {Curran Associates, Inc.},
+  url       = {http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf}
+}
+
+@inproceedings{unleashing-mayhem-on-binary-code,
+  title     = {Unleashing Mayhem on Binary Code},
+  author    = {Sang Kil Cha and Thanassis Avgerinos and Alexandre Rebert and David Brumley},
+  year      = {2012},
+  doi       = {10.1109/SP.2012.31},
+  url       = {http://doi.ieeecomputersociety.org/10.1109/SP.2012.31},
+  researchr = {https://researchr.org/publication/ChaARB12},
+  cites     = {0},
+  citedby   = {0},
+  pages     = {380-394},
+  booktitle = {IEEE Symposium on Security and Privacy, SP 2012, 21-23 May 2012, San Francisco, California, USA},
+  publisher = {IEEE Computer Society},
+  isbn      = {978-0-7695-4681-0}
+}
+
+@article{fuzzolic-hybrid-fuzzer,
+  author     = {Borzacchiello, Luca and Coppa, Emilio and Demetrescu, Camil},
+  title      = {FUZZOLIC: Mixing Fuzzing and Concolic Execution},
+  year       = {2021},
+  issue_date = {Sep 2021},
+  publisher  = {Elsevier Advanced Technology Publications},
+  address    = {GBR},
+  volume     = {108},
+  number     = {C},
+  issn       = {0167-4048},
+  url        = {https://doi.org/10.1016/j.cose.2021.102368},
+  doi        = {10.1016/j.cose.2021.102368},
+  journal    = {Comput. Secur.},
+  month      = {sep},
+  numpages   = {26},
+  keywords   = {Fuzzing testing, Hybrid fuzzing, SMT Solver, Concolic execution, Bug detection}
+}
+
+@inproceedings{AFLplusplus-Woot20,
+  author    = {Andrea Fioraldi and Dominik Maier and Heiko Ei{\ss}feldt and Marc Heuse},
+  title     = {{AFL++}: Combining Incremental Steps of Fuzzing Research},
+  booktitle = {14th {USENIX} Workshop on Offensive Technologies ({WOOT} 20)},
+  year      = {2020},
+  publisher = {{USENIX} Association},
+  month     = aug
+}
+
+@inproceedings{saudel15,
+  author    = {Saudel, Florent and Salwan, Jonathan},
+  title     = {{{Triton}}: A Dynamic Symbolic Execution Framework},
+  booktitle = {Symposium sur la s{\'{e}}curit{\'{e}} des technologies de l'information
+               et des communications},
+  series    = {SSTIC},
+  pages     = {31--54},
+  year      = {2015},
+  url       = {https://triton.quarkslab.com/files/sstic2015_slide_en_saudel_salwan.pdf}
+}
+
+@article{a-survey-of-symbolic-execution-techniques,
+  author     = {Baldoni, Roberto and Coppa, Emilio and D’elia, Daniele Cono and Demetrescu, Camil and Finocchi, Irene},
+  title      = {A Survey of Symbolic Execution Techniques},
+  year       = {2018},
+  issue_date = {May 2019},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {51},
+  number     = {3},
+  issn       = {0360-0300},
+  url        = {https://doi.org/10.1145/3182657},
+  doi        = {10.1145/3182657},
+  abstract   = {Many security and software testing applications require checking whether certain properties of a program hold for any possible usage scenario. For instance, a tool for identifying software vulnerabilities may need to rule out the existence of any backdoor to bypass a program’s authentication. One approach would be to test the program using different, possibly random inputs. As the backdoor may only be hit for very specific program workloads, automated exploration of the space of possible inputs is of the essence. Symbolic execution provides an elegant solution to the problem, by systematically exploring many possible execution paths at the same time without necessarily requiring concrete inputs. Rather than taking on fully specified input values, the technique abstractly represents them as symbols, resorting to constraint solvers to construct actual instances that would cause property violations. Symbolic execution has been incubated in dozens of tools developed over the past four decades, leading to major practical breakthroughs in a number of prominent software reliability applications. The goal of this survey is to provide an overview of the main ideas, challenges, and solutions developed in the area, distilling them for a broad audience.},
+  journal    = {ACM Comput. Surv.},
+  month      = {may},
+  articleno  = {50},
+  numpages   = {39},
+  keywords   = {software testing, static analysis, Symbolic execution, concolic execution}
+}
+
+@misc{superion-grammar-fuzzer,
+  doi       = {10.48550/ARXIV.1812.01197},
+  url       = {https://arxiv.org/abs/1812.01197},
+  author    = {Wang, Junjie and Chen, Bihuan and Wei, Lei and Liu, Yang},
+  keywords  = {Cryptography and Security (cs.CR), Software Engineering (cs.SE), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title     = {Superion: Grammar-Aware Greybox Fuzzing},
+  publisher = {arXiv},
+  year      = {2018},
+  copyright = {arXiv.org perpetual, non-exclusive license}
+}
+
+@article{nautilus-grammar-fuzzer,
+  title   = {NAUTILUS: Fishing for Deep Bugs with Grammars},
+  author  = {Cornelius Aschermann and Tommaso Frassetto and Thorsten Holz and Patrick Jauernig and Ahmad-Reza Sadeghi and Daniel Teuchert},
+  journal = {Proceedings 2019 Network and Distributed System Security Symposium},
+  year    = {2019}
+}
+
+@article{sydr-cutting-edge-dynamic-symbolic-execution,
+  author     = {Alexey V. Vishnyakov and
+                Andrey Fedotov and
+                Daniil O. Kuts and
+                Alexander A. Novikov and
+                Darya Parygina and
+                Eli Kobrin and
+                Vlada Logunova and
+                Pavel Belecky and
+                Shamil F. Kurmangaleev},
+  title      = {Sydr: Cutting Edge Dynamic Symbolic Execution},
+  journal    = {CoRR},
+  volume     = {abs/2011.09269},
+  year       = {2020},
+  url        = {https://arxiv.org/abs/2011.09269},
+  eprinttype = {arXiv},
+  eprint     = {2011.09269},
+  timestamp  = {Tue, 12 Jan 2021 15:30:06 +0100},
+  biburl     = {https://dblp.org/rec/journals/corr/abs-2011-09269.bib},
+  bibsource  = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{symbolic-security-predicates,
+  author     = {Alexey V. Vishnyakov and
+                Vlada Logunova and
+                Eli Kobrin and
+                Daniil O. Kuts and
+                Darya Parygina and
+                Andrey Fedotov},
+  title      = {Symbolic Security Predicates: Hunt Program Weaknesses},
+  journal    = {CoRR},
+  volume     = {abs/2111.05770},
+  year       = {2021},
+  url        = {https://arxiv.org/abs/2111.05770},
+  eprinttype = {arXiv},
+  eprint     = {2111.05770},
+  timestamp  = {Tue, 16 Nov 2021 12:12:31 +0100},
+  biburl     = {https://dblp.org/rec/journals/corr/abs-2111-05770.bib},
+  bibsource  = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{symbolic-pointers-reasoning,
+  author     = {Daniil O. Kuts},
+  title      = {Towards Symbolic Pointers Reasoning in Dynamic Symbolic Execution},
+  journal    = {CoRR},
+  volume     = {abs/2109.03698},
+  year       = {2021},
+  url        = {https://arxiv.org/abs/2109.03698},
+  eprinttype = {arXiv},
+  eprint     = {2109.03698},
+  timestamp  = {Mon, 20 Sep 2021 16:29:41 +0200},
+  biburl     = {https://dblp.org/rec/journals/corr/abs-2109-03698.bib},
+  bibsource  = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{FuzzBench,
+  author    = {Metzman, Jonathan and Szekeres, L\'{a}szl\'{o} and Maurice Romain Simon, Laurent and Trevelin Sprabery, Read and Arya, Abhishek},
+  title     = {{FuzzBench: An Open Fuzzer Benchmarking Platform and Service}},
+  year      = {2021},
+  isbn      = {9781450385626},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/3468264.3473932},
+  doi       = {10.1145/3468264.3473932},
+  booktitle = {Proceedings of the 29th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering},
+  pages     = {1393–1403},
+  numpages  = {11},
+  series    = {ESEC/FSE 2021}
+}
+
+@inproceedings{KLEE-OSDI-2008,
+  author    = {Cadar, Cristian and Dunbar, Daniel and Engler, Dawson R.},
+  biburl    = {https://www.bibsonomy.org/bibtex/2f23cc082a4d350585f4b0e8c8d4d5c9c/dblp},
+  booktitle = {OSDI},
+  editor    = {Draves, Richard and van Renesse, Robbert},
+  ee        = {http://www.usenix.org/events/osdi08/tech/full_papers/cadar/cadar.pdf},
+  isbn      = {978-1-931971-65-2},
+  keywords  = {dblp},
+  pages     = {209-224},
+  publisher = {USENIX Association},
+  timestamp = {2020-03-13T12:42:02.000+0100},
+  title     = {KLEE: Unassisted and Automatic Generation of High-Coverage Tests for Complex Systems Programs.},
+  url       = {http://dblp.uni-trier.de/db/conf/osdi/osdi2008.html#CadarDE08},
+  year      = 2008
+}
+
+
