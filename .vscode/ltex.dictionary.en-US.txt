@@ -11,3 +11,8 @@ FuzzBench
 fuzzer
 Fuzzer
 sydr-fuzz
+Fuzzers
+Gramatron
+LibFuzzer
+Nyx
+kAFL

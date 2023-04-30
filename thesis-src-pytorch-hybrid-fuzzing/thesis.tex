@@ -1,5 +1,6 @@
 \documentclass[a4paper,14pt]{extarticle}
 \usepackage{geometry}
+\usepackage{algorithmicx}
 \usepackage[utf8]{inputenc}
 \usepackage{csquotes}
 \usepackage[T1]{fontenc}
@@ -14,6 +15,7 @@
 \usepackage{tikz}
 \usepackage{pgf}
 \usepackage{subcaption}
+\usepackage{enumitem}
 \usepackage{listings}
 \usepackage{indentfirst}
 \usepackage[colorlinks,citecolor=blue,linkcolor=blue,bookmarks=false,hypertexnames=true, urlcolor=blue]{hyperref} 
@@ -22,11 +24,18 @@
 \usepackage{booktabs}
 \usepackage[flushleft]{threeparttable}
 \usepackage{tablefootnote}
+\usepackage{lstfiracode}
+\usepackage{xcolor}
+\usepackage{algorithm2e}
 
 \usepackage{chngcntr}
 \counterwithin{equation}{section}
 \counterwithin{table}{section}
 \counterwithin{figure}{section}
+
+\lstset{basicstyle=\ttfamily}
+\setlist[itemize]{noitemsep, topsep=0pt}
+\setlist[enumerate]{noitemsep, topsep=0pt}
 
 % \graphicspath{{graphics/}}
 
@@ -63,11 +72,14 @@
 \section*{Annotation}
 \addcontentsline{toc}{section}{Annotation} % add Annotation to Table of Contents
 
-Your annotation in English.
+As the number and complexity of software systems continue to increase at a rapid pace, an ever-growing number of these systems are becoming critical to our daily lives.
+
+AI takes this trend to a whole new level by allowing software systems to make decisions that were previously reserved for humans. With these advances in the field of information technologies, it is more important than ever to ensure that critical systems are robust and secure against cyber threats.
+
+In this thesis, we will take a look at the problem of software security and how it can be addressed using automated analysis techniques. We will also improve several aspects of the existing hybrid-fuzzing tools and apply them to the PyTorch framework to detect bugs and vulnerabilities in its code.
 
 \section*{\foreignlanguage{russian}{Аннотация}} % this is how to use russian
 \foreignlanguage{russian}{
-	Ваша аннотация на русском языке.
 }
 
 \section*{Keywords}
@@ -76,7 +88,7 @@ Hybrid Fuzzing, Program Security, Dynamic Analysis, PyTorch, AI Frameworks Secur
 
 \include{introduction.tex}
 
-\include{hybrid-fuzzing.tex}
+\include{software-security-analysis-techniques.tex}
 
 \include{pytorch-fuzzing.tex}
 

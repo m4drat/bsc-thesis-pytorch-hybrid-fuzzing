@@ -1,0 +1,92 @@
+\section{Software Security Analysis Techniques}
+
+As we have seen in the previous section, software security is a question of paramount importance in the modern world. Due to the increasing complexity of software systems, it is no longer feasible to rely only on manual code reviews and testing to ensure that they are secure. Instead, a variety of automated analysis techniques have been developed to help developers detect and address security vulnerabilities in their software.
+
+The security analysis techniques can be broadly divided into two categories:
+
+\begin{itemize}
+    \item Static Analysis
+    \item Dynamic Analysis
+\end{itemize}
+
+In this section, we will provide an overview of static analysis and then delve into a detailed examination of dynamic analysis techniques.
+
+\subsection{Static Analysis}
+
+A set of techniques known as static analysis involves analyzing the source code of a program without executing it. This approach allows to detect a wide range of problems in the code, potentially examining all possible execution paths.
+
+Although static analysis tends to be more exhaustive, it suffers a lot from false positives as well as false negatives. Furthermore, static analysis tends to be very slow and resource-intensive, especially for large codebases.
+
+To mitigate these concerns, dynamic analysis is frequently employed in conjunction with static analysis. Although it may not be as comprehensive as static analysis, it allows identifying issues that static analysis may miss.
+
+\subsection{Dynamic Analysis}
+
+Dynamic analysis, also known as fuzzing is one of the most popular techniques for finding bugs and vulnerabilities in software. It involves running a program with various inputs and monitoring its behavior. The goal of fuzzing is to detect error conditions in the program by observing its behavior under different inputs.
+
+Consider example \ref{lst:example1}. This program takes a string as an input and checks if the first four characters are equal to "FUZZ". If they are, the program crashes. Otherwise, it does nothing.
+
+\begin{lstlisting}[caption={Fuzzing example}, label={lst:example1}, language=C, xleftmargin=2em, breaklines=true, captionpos=b]
+    void crash(char* buf) {
+        if (buf[0] == 'F') {
+            if (buf[1] == 'U') {
+                if (buf[2] == 'Z') {
+                    if (buf[3] == 'Z') {
+                        *(int*)NULL = 0x1337;
+                    }
+                }
+            }
+        }
+    }
+\end{lstlisting}
+
+The goal of a generic fuzzer would be to automatically find an input that would cause the program to crash.
+
+The simplest way to do so would be to exhaustively test all possible inputs. While this works well in theory and is guaranteed to find the bug, it is not feasible in practice, as the number of possible inputs grows exponentially with the size of the input. For a program that processes a string of 10 characters, where each character can be any of the 127 ASCII characters, the total number of possible inputs is $127^{10} \approx 1.0915 \times 10^{21}$. This number is far too large to be tested in a reasonable amount of time. Instead, a smarter approach is required.
+
+\subsubsection{Fuzzers Overview}
+
+To compensate for the exponential growth of the input space, fuzzers use various techniques to guide the input generation. For example, state-of-the-art, general-purpose fuzzer AFL++ \cite{AFLplusplus-Woot20} uses a technique called \textit{coverage-guided fuzzing} to generate inputs that are more likely to trigger bugs. This technique involves instrumenting the program to collect code coverage information and then using this information to guide the generation of inputs towards unexplored parts of the program.
+
+Another example of input generation techniques used by fuzzers is \textit{grammar-based fuzzing}. This technique involves defining a grammar that describes the structure and syntax of valid inputs for a given program. The fuzzer then generates inputs that conform to this grammar, exploring different paths through the grammar to generate diverse inputs. This technique is used by various fuzzers, including Nautilus \cite{nautilus-grammar-fuzzer}, Superion \cite{superion-grammar-fuzzer}, Gramatron \cite{gramatron-effective-grammar-aware-fuzzing}, and others.
+
+Besides different approaches to input generation, fuzzers are also distinguished by the type of target they are designed to test. For example, Nyx \cite{nyx-hypervisor-fuzzer-usenix21} or kAFL \cite{kafl-usenix17} are fuzzers designed to work on a hypervisor level allowing to fuzz OS kernel, drivers, and other hard-to-test components. On the other hand, AFL++ or LibFuzzer are examples of general-purpose fuzzers.
+
+\subsubsection{Fuzz Testing Algorithm}
+
+While fuzzers might look very different on the surface, they all share the same basic structure and follow a similar algorithm. In the paper \cite{the-art-science-and-engineering-of-fuzzing-a-survey}, the authors present a high-level overview of the fuzzing process.
+
+Omitting some details, the fuzzing process can be summarized as follows:
+
+\begin{enumerate}
+    \item Preprocessing - prepare a corpus of inputs, instrument the program to collect coverage information, etc.
+    \item Scheduling - select fuzzing strategies, etc.
+    \item Input generation - select an input from the corpus, mutate the input, generate new inputs, etc.
+    \item Input evaluation - run the program with the input, collect feedback (e.g. coverage information, crashes, etc.)
+    \item Continue fuzzing until a stopping condition is met (e.g. a timeout)
+\end{enumerate}
+
+To implement the fuzzing process described above, a fuzzing loop can be used as shown in Algorithm \ref{alg:fuzzing-loop}.
+
+\begin{algorithm}
+    \caption{Fuzzing loop}
+    \label{alg:fuzzing-loop}
+    $queue \gets construct\_queue()$ \\
+    \While{should fuzz} {
+        $input \gets select\_input(queue)$ \\
+        $input \gets mutate(input)$ \\
+        $feedback \gets run\_program(input)$ \\
+        \If{feedback is crash} {
+            $report\_bug(input)$ \\
+        }
+
+        \If{feedback is interesting} {
+            $queue.push(input)$ \\
+        }
+    }
+\end{algorithm}
+
+The fuzzing loop described in Algorithm \ref{alg:fuzzing-loop} abstracts away details of the fuzzing process and allows us to focus on the individual components of the fuzzer. Each of these components can be customized to
+
+\subsection{Symbolic Interpretation}
+
+\subsection{Hybrid Fuzzing}

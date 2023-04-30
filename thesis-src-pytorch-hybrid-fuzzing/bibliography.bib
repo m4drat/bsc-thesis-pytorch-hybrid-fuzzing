@@ -41,6 +41,89 @@
   isbn      = {978-0-7695-4681-0}
 }
 
+@inproceedings{effective-seed-scheduling-for-fuzzing-with-graph-centrality-analysis,
+  author    = {She, Dongdong and Shah, Abhishek and Jana, Suman},
+  booktitle = {2022 IEEE Symposium on Security and Privacy (SP)},
+  title     = {Effective Seed Scheduling for Fuzzing with Graph Centrality Analysis},
+  year      = {2022},
+  volume    = {},
+  number    = {},
+  pages     = {2194-2211},
+  doi       = {10.1109/SP46214.2022.9833761}
+}
+
+
+@inproceedings{nyx-hypervisor-fuzzer-usenix21,
+  author    = {Sergej Schumilo and Cornelius Aschermann and Ali Abbasi and Simon W{\"o}r-ner and Thorsten Holz},
+  title     = {Nyx: Greybox Hypervisor Fuzzing using Fast Snapshots and Affine Types},
+  booktitle = {30th USENIX Security Symposium (USENIX Security 21)},
+  year      = {2021},
+  isbn      = {978-1-939133-24-3},
+  pages     = {2597--2614},
+  url       = {https://www.usenix.org/conference/usenixsecurity21/presentation/schumilo},
+  publisher = {USENIX Association},
+  month     = aug
+}
+
+@inproceedings{kafl-usenix17,
+  author    = {Sergej Schumilo and Cornelius Aschermann and Robert Gawlik and Sebastian Schinzel and Thorsten Holz},
+  title     = {{kAFL}: {Hardware-Assisted} Feedback Fuzzing for {OS} Kernels},
+  booktitle = {26th USENIX Security Symposium (USENIX Security 17)},
+  year      = {2017},
+  isbn      = {978-1-931971-40-9},
+  address   = {Vancouver, BC},
+  pages     = {167--182},
+  url       = {https://www.usenix.org/conference/usenixsecurity17/technical-sessions/presentation/schumilo},
+  publisher = {USENIX Association},
+  month     = aug
+}
+
+@inproceedings{10.1145/3548606.3560602,
+  author    = {Fioraldi, Andrea and Maier, Dominik Christian and Zhang, Dongjia and Balzarotti, Davide},
+  title     = {LibAFL: A Framework to Build Modular and Reusable Fuzzers},
+  year      = {2022},
+  isbn      = {9781450394505},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/3548606.3560602},
+  doi       = {10.1145/3548606.3560602},
+  abstract  = {The release of AFL marked an important milestone in the area of software security testing, revitalizing fuzzing as a major research topic and spurring a large number of research studies that attempted to improve and evaluate the different aspects of the fuzzing pipeline.Many of these studies implemented their techniques by forking the AFL codebase. While this choice might seem appropriate at first, combining multiple forks into a single fuzzer requires a high engineering overhead, which hinders progress in the area and prevents fair and objective evaluations of different techniques. The highly fragmented landscape of the fuzzing ecosystem also prevents researchers from combining orthogonal techniques and makes it difficult for end users to adopt new prototype solutions.To tackle this problem, in this paper we propose LibAFL, a framework to build modular and reusable fuzzers. We discuss the different components generally used in fuzzing and map them to an extensible framework. LibAFL allows researchers and engineers to extend the core fuzzer pipeline and share their new components for further evaluations. As part of LibAFL, we integrated techniques from more than 20 previous works and conduct extensive experiments to show the benefit of our framework to combine and evaluate different approaches. We hope this can help to shed light on current advancements in fuzzing and provide a solid base for comparative and extensible research in the future.},
+  booktitle = {Proceedings of the 2022 ACM SIGSAC Conference on Computer and Communications Security},
+  pages     = {1051–1065},
+  numpages  = {15},
+  keywords  = {fuzzing, fuzz testing, framework},
+  location  = {Los Angeles, CA, USA},
+  series    = {CCS '22}
+}
+
+@misc{the-art-science-and-engineering-of-fuzzing-a-survey,
+  title         = {The Art, Science, and Engineering of Fuzzing: A Survey},
+  author        = {Valentin J. M. Manes and HyungSeok Han and Choongwoo Han and Sang Kil Cha and Manuel Egele and Edward J. Schwartz and Maverick Woo},
+  year          = {2019},
+  eprint        = {1812.00140},
+  archiveprefix = {arXiv},
+  primaryclass  = {cs.CR}
+}
+
+@inproceedings{gramatron-effective-grammar-aware-fuzzing,
+  author    = {Srivastava, Prashast and Payer, Mathias},
+  title     = {Gramatron: Effective Grammar-Aware Fuzzing},
+  year      = {2021},
+  isbn      = {9781450384599},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/3460319.3464814},
+  doi       = {10.1145/3460319.3464814},
+  abstract  = {Fuzzers aware of the input grammar can explore deeper program states using grammar-aware mutations. Existing grammar-aware fuzzers are ineffective at synthesizing complex bug triggers due to: (i) grammars introducing a sampling bias during input generation due to their structure, and (ii) the current mutation operators for parse trees performing localized small-scale changes. Gramatron uses grammar automatons in conjunction with aggressive mutation operators to synthesize complex bug triggers faster. We build grammar automatons to address the sampling bias. It restructures the grammar to allow for unbiased sampling from the input state space. We redesign grammar-aware mutation operators to be more aggressive, i.e., perform large-scale changes. Gramatron can consistently generate complex bug triggers in an efficient manner as compared to using conventional grammars with parse trees. Inputs generated from scratch by Gramatron have higher diversity as they achieve up to 24.2 more coverage relative to existing fuzzers. Gramatron makes input generation 98 faster and the input representations are 24 smaller. Our redesigned mutation operators are 6.4\texttimes{} more aggressive while still being 68 faster at performing these mutations. We evaluate Gramatron across three interpreters with 10 known bugs consisting of three complex bug triggers and seven simple bug triggers against two Nautilus variants. Gramatron finds all the complex bug triggers reliably and faster. For the simple bug triggers, Gramatron outperforms Nautilus four out of seven times. To demonstrate Gramatron’s effectiveness in the wild, we deployed Gramatron on three popular interpreters for a 10-day fuzzing campaign where it discovered 10 new vulnerabilities.},
+  booktitle = {Proceedings of the 30th ACM SIGSOFT International Symposium on Software Testing and Analysis},
+  pages     = {244–256},
+  numpages  = {13},
+  keywords  = {dynamic software analysis, grammar-aware, Fuzzing},
+  location  = {Virtual, Denmark},
+  series    = {ISSTA 2021}
+}
+
+
 @article{fuzzolic-hybrid-fuzzer,
   author     = {Borzacchiello, Luca and Coppa, Emilio and Demetrescu, Camil},
   title      = {FUZZOLIC: Mixing Fuzzing and Concolic Execution},
