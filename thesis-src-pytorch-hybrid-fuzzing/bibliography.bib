@@ -26,6 +26,28 @@
   url       = {http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf}
 }
 
+@inproceedings{triton-sstic2015,
+  author    = {Saudel, Florent and Salwan, Jonathan},
+  title     = {{{Triton}}: A Dynamic Symbolic Execution Framework},
+  booktitle = {Symposium sur la s{\'{e}}curit{\'{e}} des technologies de l'information
+               et des communications},
+  series    = {SSTIC},
+  pages     = {31--54},
+  year      = {2015},
+  url       = {https://triton.quarkslab.com/files/sstic2015_slide_en_saudel_salwan.pdf}
+}
+
+@inproceedings{qemu-usenix2005,
+  author    = {Fabrice Bellard},
+  title     = {{QEMU}, a Fast and Portable Dynamic Translator},
+  booktitle = {2005 USENIX Annual Technical Conference (USENIX ATC 05)},
+  year      = {2005},
+  address   = {Anaheim, CA},
+  url       = {https://www.usenix.org/conference/2005-usenix-annual-technical-conference/qemu-fast-and-portable-dynamic-translator},
+  publisher = {USENIX Association},
+  month     = apr
+}
+
 @inproceedings{unleashing-mayhem-on-binary-code,
   title     = {Unleashing Mayhem on Binary Code},
   author    = {Sang Kil Cha and Thanassis Avgerinos and Alexandre Rebert and David Brumley},
@@ -39,6 +61,79 @@
   booktitle = {IEEE Symposium on Security and Privacy, SP 2012, 21-23 May 2012, San Francisco, California, USA},
   publisher = {IEEE Computer Society},
   isbn      = {978-0-7695-4681-0}
+}
+
+@inproceedings{driller-ndss16,
+  title     = {Driller: Augmenting Fuzzing Through Selective Symbolic Execution.},
+  author    = {Stephens, Nick and Grosen, John and Salls, Christopher and Dutcher, Audrey and Wang, Ruoyu and Corbetta, Jacopo and Shoshitaishvili, Yan and Kruegel, Christopher and Vigna, Giovanni},
+  booktitle = {NDSS},
+  volume    = {16},
+  pages     = {1--16},
+  year      = {2016}
+}
+
+@article{10.1145/1064978.1065034,
+  author     = {Luk, Chi-Keung and Cohn, Robert and Muth, Robert and Patil, Harish and Klauser, Artur and Lowney, Geoff and Wallace, Steven and Reddi, Vijay Janapa and Hazelwood, Kim},
+  title      = {Pin: Building Customized Program Analysis Tools with Dynamic Instrumentation},
+  year       = {2005},
+  issue_date = {June 2005},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {40},
+  number     = {6},
+  issn       = {0362-1340},
+  url        = {https://doi.org/10.1145/1064978.1065034},
+  doi        = {10.1145/1064978.1065034},
+  abstract   = {Robust and powerful software instrumentation tools are essential for program analysis tasks such as profiling, performance evaluation, and bug detection. To meet this need, we have developed a new instrumentation system called Pin. Our goals are to provide easy-to-use, portable, transparent, and efficient instrumentation. Instrumentation tools (called Pintools) are written in C/C++ using Pin's rich API. Pin follows the model of ATOM, allowing the tool writer to analyze an application at the instruction level without the need for detailed knowledge of the underlying instruction set. The API is designed to be architecture independent whenever possible, making Pintools source compatible across different architectures. However, a Pintool can access architecture-specific details when necessary. Instrumentation with Pin is mostly transparent as the application and Pintool observe the application's original, uninstrumented behavior. Pin uses dynamic compilation to instrument executables while they are running. For efficiency, Pin uses several techniques, including inlining, register re-allocation, liveness analysis, and instruction scheduling to optimize instrumentation. This fully automated approach delivers significantly better instrumentation performance than similar tools. For example, Pin is 3.3x faster than Valgrind and 2x faster than DynamoRIO for basic-block counting. To illustrate Pin's versatility, we describe two Pintools in daily use to analyze production software. Pin is publicly available for Linux platforms on four architectures: IA32 (32-bit x86), EM64T (64-bit x86), Itanium®, and ARM. In the ten months since Pin 2 was released in July 2004, there have been over 3000 downloads from its website.},
+  journal    = {SIGPLAN Not.},
+  month      = {jun},
+  pages      = {190–200},
+  numpages   = {11},
+  keywords   = {instrumentation, dynamic compilation, program analysis tools}
+}
+
+@phdthesis{dynamorio-thesis,
+  author    = {Bruening, Derek L. and Amarasinghe, Saman},
+  title     = {Efficient, Transparent, and Comprehensive Runtime Code Manipulation},
+  year      = {2004},
+  publisher = {Massachusetts Institute of Technology},
+  address   = {USA},
+  abstract  = {This thesis addresses the challenges of building a software system for general-purpose runtime code manipulation. Modern applications, with dynamically-loaded modules and dynamically-generated code, are assembled at runtime. While it was once feasible at compile time to observe and manipulate every instruction—which is critical for program analysis, instrumentation, trace gathering, optimization, and similar tools—it can now only be done at runtime. Existing runtime tools are successful at inserting instrumentation calls, but no general framework has been developed for fine-grained and comprehensive code observation and modification without high overheads. This thesis demonstrates the feasibility of building such a system in software. We present DynamoRIO , a fully-implemented runtime code manipulation system that supports code transformations on any part of a program, while it executes . DynamoRIO uses code caching technology to provide efficient, transparent, and comprehensive manipulation of an unmodified application running on a stock operating system and commodity hardware. DynamoRIO executes large, complex, modern applications with dynamically-loaded, generated, or even modified code. Despite the formidable obstacles inherent in the IA-32 architecture, DynamoRIO provides these capabilities efficiently, with zero to thirty percent time and memory overhead on both Windows and Linux. DynamoRIO exports an interface for building custom runtime code manipulation tools of all types. It has been used by many researchers, with several hundred downloads of our public release, and is being commercialized in a product for protection against remote security exploits, one of numerous applications of runtime code manipulation. (Copies available exclusively from MIT Libraries, Rm. 14-0551, Cambridge, MA 02139-4307. Ph. 617-253-5668; Fax 617-253-1690.)},
+  note      = {AAI0807735}
+}
+
+@inproceedings{pintool-2005,
+  author    = {Luk, Chi-Keung and Cohn, Robert and Muth, Robert and Patil, Harish and Klauser, Artur and Lowney, Geoff and Wallace, Steven and Reddi, Vijay Janapa and Hazelwood, Kim},
+  title     = {Pin: Building Customized Program Analysis Tools with Dynamic Instrumentation},
+  year      = {2005},
+  isbn      = {1595930566},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/1065010.1065034},
+  doi       = {10.1145/1065010.1065034},
+  abstract  = {Robust and powerful software instrumentation tools are essential for program analysis tasks such as profiling, performance evaluation, and bug detection. To meet this need, we have developed a new instrumentation system called Pin. Our goals are to provide easy-to-use, portable, transparent, and efficient instrumentation. Instrumentation tools (called Pintools) are written in C/C++ using Pin's rich API. Pin follows the model of ATOM, allowing the tool writer to analyze an application at the instruction level without the need for detailed knowledge of the underlying instruction set. The API is designed to be architecture independent whenever possible, making Pintools source compatible across different architectures. However, a Pintool can access architecture-specific details when necessary. Instrumentation with Pin is mostly transparent as the application and Pintool observe the application's original, uninstrumented behavior. Pin uses dynamic compilation to instrument executables while they are running. For efficiency, Pin uses several techniques, including inlining, register re-allocation, liveness analysis, and instruction scheduling to optimize instrumentation. This fully automated approach delivers significantly better instrumentation performance than similar tools. For example, Pin is 3.3x faster than Valgrind and 2x faster than DynamoRIO for basic-block counting. To illustrate Pin's versatility, we describe two Pintools in daily use to analyze production software. Pin is publicly available for Linux platforms on four architectures: IA32 (32-bit x86), EM64T (64-bit x86), Itanium®, and ARM. In the ten months since Pin 2 was released in July 2004, there have been over 3000 downloads from its website.},
+  booktitle = {Proceedings of the 2005 ACM SIGPLAN Conference on Programming Language Design and Implementation},
+  pages     = {190–200},
+  numpages  = {11},
+  keywords  = {program analysis tools, dynamic compilation, instrumentation},
+  location  = {Chicago, IL, USA},
+  series    = {PLDI '05}
+}
+
+@inproceedings{angr-shoshitaishvili2016state,
+  title     = {{SoK: (State of) The Art of War: Offensive Techniques in Binary Analysis}},
+  author    = {Shoshitaishvili, Yan and Wang, Ruoyu and Salls, Christopher and
+               Stephens, Nick and Polino, Mario and Dutcher, Audrey and Grosen, John and
+               Feng, Siji and Hauser, Christophe and Kruegel, Christopher and Vigna, Giovanni},
+  booktitle = {IEEE Symposium on Security and Privacy},
+  year      = {2016}
+}
+
+@article{redqueen-ndss19,
+  title   = {REDQUEEN: Fuzzing with Input-to-State Correspondence},
+  author  = {Cornelius Aschermann and Sergej Schumilo and Tim Blazytko and Robert Gawlik and Thorsten Holz},
+  journal = {Proceedings 2019 Network and Distributed System Security Symposium},
+  year    = {2019}
 }
 
 @inproceedings{effective-seed-scheduling-for-fuzzing-with-graph-centrality-analysis,
@@ -78,7 +173,7 @@
   month     = aug
 }
 
-@inproceedings{10.1145/3548606.3560602,
+@inproceedings{libafl-ccs21,
   author    = {Fioraldi, Andrea and Maier, Dominik Christian and Zhang, Dongjia and Balzarotti, Davide},
   title     = {LibAFL: A Framework to Build Modular and Reusable Fuzzers},
   year      = {2022},
@@ -149,17 +244,6 @@
   year      = {2020},
   publisher = {{USENIX} Association},
   month     = aug
-}
-
-@inproceedings{saudel15,
-  author    = {Saudel, Florent and Salwan, Jonathan},
-  title     = {{{Triton}}: A Dynamic Symbolic Execution Framework},
-  booktitle = {Symposium sur la s{\'{e}}curit{\'{e}} des technologies de l'information
-               et des communications},
-  series    = {SSTIC},
-  pages     = {31--54},
-  year      = {2015},
-  url       = {https://triton.quarkslab.com/files/sstic2015_slide_en_saudel_salwan.pdf}
 }
 
 @article{a-survey-of-symbolic-execution-techniques,
@@ -270,6 +354,64 @@
   series    = {ESEC/FSE 2021}
 }
 
+@inproceedings{z3-smt-solver,
+  author    = {de Moura, Leonardo
+               and Bj{\o}rner, Nikolaj},
+  editor    = {Ramakrishnan, C. R.
+               and Rehof, Jakob},
+  title     = {Z3: An Efficient SMT Solver},
+  booktitle = {Tools and Algorithms for the Construction and Analysis of Systems},
+  year      = {2008},
+  publisher = {Springer Berlin Heidelberg},
+  address   = {Berlin, Heidelberg},
+  pages     = {337--340},
+  abstract  = {Satisfiability Modulo Theories (SMT) problem is a decision problem for logical first order formulas with respect to combinations of background theories such as: arithmetic, bit-vectors, arrays, and uninterpreted functions. Z3 is a new and efficient SMT Solver freely available from Microsoft Research. It is used in various software verification and analysis applications.},
+  isbn      = {978-3-540-78800-3}
+}
+
+@article{bitwuza-smt-comp-2020,
+  author        = {Aina Niemetz and
+                   Mathias Preiner},
+  title         = {Bitwuzla at the {SMT-COMP} 2020},
+  journal       = {CoRR},
+  volume        = {abs/2006.01621},
+  year          = {2020},
+  url           = {https://arxiv.org/abs/2006.01621},
+  archiveprefix = {arXiv},
+  eprint        = {2006.01621},
+  biburl        = {https://dblp.org/rec/journals/corr/abs-2006-01621.bib},
+  bibsource     = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{cvc5-smt-solver,
+  author    = {Barbosa, Haniel
+               and Barrett, Clark
+               and Brain, Martin
+               and Kremer, Gereon
+               and Lachnitt, Hanna
+               and Mann, Makai
+               and Mohamed, Abdalrhman
+               and Mohamed, Mudathir
+               and Niemetz, Aina
+               and N{\"o}tzli, Andres
+               and Ozdemir, Alex
+               and Preiner, Mathias
+               and Reynolds, Andrew
+               and Sheng, Ying
+               and Tinelli, Cesare
+               and Zohar, Yoni},
+  editor    = {Fisman, Dana
+               and Rosu, Grigore},
+  title     = {cvc5: A Versatile and Industrial-Strength SMT Solver},
+  booktitle = {Tools and Algorithms for the Construction and Analysis of Systems},
+  year      = {2022},
+  publisher = {Springer International Publishing},
+  address   = {Cham},
+  pages     = {415--442},
+  abstract  = {cvc5 is the latest SMT solver in the cooperating validity checker series and builds on the successful code base of CVC4. This paper serves as a comprehensive system description of cvc5 's architectural design and highlights the major features and components introduced since CVC4  1.8. We evaluate cvc5 's performance on all benchmarks in SMT-LIB and provide a comparison against CVC4 and Z3.},
+  isbn      = {978-3-030-99524-9}
+}
+
 @inproceedings{KLEE-OSDI-2008,
   author    = {Cadar, Cristian and Dunbar, Daniel and Engler, Dawson R.},
   biburl    = {https://www.bibsonomy.org/bibtex/2f23cc082a4d350585f4b0e8c8d4d5c9c/dblp},
@@ -285,5 +427,3 @@
   url       = {http://dblp.uni-trier.de/db/conf/osdi/osdi2008.html#CadarDE08},
   year      = 2008
 }
-
-

@@ -4,6 +4,7 @@
             "name": "latexmk",
             "command": "latexmk",
             "args": [
+                "-shell-escape",
                 "-synctex=1",
                 "-interaction=nonstopmode",
                 "-file-line-error",
@@ -17,6 +18,7 @@
             "name": "xelatex",
             "command": "xelatex",
             "args": [
+                "-shell-escape",
                 "-synctex=1",
                 "-interaction=nonstopmode",
                 "-file-line-error",
@@ -28,6 +30,7 @@
             "name": "pdflatex",
             "command": "pdflatex",
             "args": [
+                "-shell-escape",
                 "-synctex=1",
                 "-interaction=nonstopmode",
                 "-file-line-error",
