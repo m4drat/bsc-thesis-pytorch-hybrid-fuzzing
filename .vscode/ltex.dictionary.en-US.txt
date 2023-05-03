@@ -26,3 +26,6 @@ syscall
 QSym
 Dynamorio
 pintool
+concolic
+DBI
+DynamoRIO

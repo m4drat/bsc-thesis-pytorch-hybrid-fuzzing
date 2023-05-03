@@ -186,14 +186,6 @@ from triton import *
 >>> zf_expr = ctx.getSymbolicRegister(ctx.registers.zf)
 >>> print(zf_expr)
 (define-fun ref!14 () (_ BitVec 1) (ite (= ref!8 (_ bv0 32)) (_ bv1 1) (_ bv0 1))) ; Zero flag
-
->>> # Solve constraint
->>> ctx.getModel(zf_expr.getAst() == 0x1)
-{0: sym_eax:32 = 0x1d}
-
->>> # 0x1d * 0xa9a57b is indeed equal to 0x1337beef
->>> hex(0x1d * 0xa9a57b)
-'0x1337beef'
 	\end{minted}
 	\end{minipage}
 	\caption{Triton API example}
@@ -202,35 +194,100 @@ from triton import *
 
 Triton provides a powerful mechanism for interpreting machine code instructions and updating the symbolic state simultaneously. However, it may not be able to handle certain scenarios such as external library calls or complex OS-dependent instructions like \texttt{syscall}. In such cases, it may be necessary to actually run the program and symbolically execute as much as possible, while concretizing the remaining instructions that cannot be symbolically executed.
 
-This approach is widely used by many symbolic execution engines, such as QSym \cite{qsym-usenix2018} and Sydr.
+This approach is commonly used by various symbolic execution engines, such as QSym \cite{qsym-usenix2018} and others. In the case of QSym, the symbolic execution engine simply concretizes the instructions that cannot be symbolically executed, and then continues with the symbolic execution. This approach is called \textit{concolic execution} and is widely used in symbolic execution engines.
 
-So, we have a way to maintain symbolic state
+% With the power of Triton we have a way to maintain a symbolic state of the program.
 
 \subsubsection{Dynamic Constraints Collection}
 
-% bochs, Frida, QEMU, QBDI, tinyinst
+A key component of concolic execution is dynamic constraints collection, which is performed using a concrete executor that runs a program with specific inputs and collects constraints on those inputs.
 
-Dynamorio \cite{dynamorio-thesis}, pintool \cite{pintool-2005}, QEMU \cite{qemu-usenix2005}
+To accomplish this, dynamic binary instrumentation (DBI) frameworks are commonly employed. DBI frameworks allow for program instrumentation and constraint collection on-the-fly, providing a convenient solution to perform dynamic analysis. Popular DBI frameworks, such as Pin \cite{pintool-2005}, DynamoRIO \cite{dynamorio-thesis}, and QEMU \cite{qemu-usenix2005} can be used for this purpose.
+
+Typically, per-instruction callbacks are used in DBI frameworks to collect constraints as the program is executed. When a callback is triggered, the corresponding instruction is examined, and the constraints on the input values are collected. These constraints are then combined to form a path condition that represents all the constraints encountered during execution.
+
+With the constraints collected, we can now solve them and generate new inputs.
 
 \subsubsection{Constraints Solving}
 
-Z3 \cite{z3-smt-solver}, CVC5 \cite{cvc5-smt-solver}, Bitwuzla \cite{bitwuza-smt-comp-2020}
+To solve the constraints collected during dynamic analysis, a constraint solver is needed. The solver takes the path condition generated from the collected constraints and generates new input values that satisfy the condition. To solve the constraints, a wide range of SMT solvers can be employed, such as Z3 \cite{z3-smt-solver}, Bitwuzla \cite{bitwuza-smt-comp-2020}, CVC5 \cite{cvc5-smt-solver}, and others.
 
-\subsubsection{Approaches?}
+The efficiency and accuracy of the solver play a crucial role in the performance of concolic execution. In some cases, the solver may not be able to find a solution, or the solution may be too complex and time-consuming to compute. To address these issues, various techniques such as constraint simplification and pruning can be used to simplify the constraints and reduce the solution space.
 
-\begin{itemize}
-	\item Concolic execution (Offline) - BAP, Sydr, etc.
-	\item Fork-based (Online) - KLEE, S2E, etc.
-\end{itemize}
+Once the solver generates new input values, the program can be executed again with the updated inputs, and the process of constraint collection and solving can be repeated. This iterative process continues until all paths have been explored, or until a specific goal, such as reaching a specific code location or triggering a specific vulnerability, is achieved.
+
+To illustrate the process of constraint solving, we can use the example from Listing \ref{lst:example4}. In this example, we symbolically executed the \texttt{mul} instruction and generated a constraint on the \texttt{ZF} flag. We can now solve this constraint using the Triton API, as shown in Listing \ref{lst:example5}. The solution to the constraint is \texttt{sym\_eax = 0x1d}, which is the value that would trigger the \texttt{error()} function.
+
+\begin{listing}[htp]
+	\centering
+	\begin{minipage}{.7\linewidth}
+		\begin{minted}[linenos=true, tabsize=4, breaklines=true, fontsize=\small]{python}
+>>> # Solve constraint
+>>> ctx.getModel(zf_expr.getAst() == 0x1)
+{0: sym_eax:32 = 0x1d}
+
+>>> # 0x1d * 0xa9a57b is indeed equal to 0x1337beef
+>>> hex(0x1d * 0xa9a57b)
+'0x1337beef'
+\end{minted}
+	\end{minipage}
+	\caption{Triton getModel() API example}
+	\label{lst:example5}
+\end{listing}
+
+\subsubsection{Benefits}
+
+With the ability to symbolically execute a program and generate new inputs that satisfy a specific condition, a few obvious benefits arise.
+
+First, we can automatically generate inputs that would open up new paths in the program. This allows us to explore different program states and as a result, test different aspects of the program. This is called \textit{path exploration} and is one of the main benefits that symbolic execution provides.
+
+The second benefit is the ability to not only explore different paths, but also to check security invariants. For example, we can check if a specific code location is reachable, or if a specific condition can be satisfied. This is called \textit{security invariant checking} and is another key benefit of symbolic execution. This technique allows us to check if a specific vulnerability can be triggered, for example, if it is possible to generate such an input that would trigger an out-of-bounds access. Consider the example from Listing \ref{lst:example6}.
+
+\begin{listing}[htp]
+	\centering
+	\begin{minipage}{.4\linewidth}
+		\begin{minted}[linenos=true, tabsize=4]{c}
+void vuln(uint32_t index) {
+	char data[64];
+	if (index < 74)
+		data[index] = 0x37;
+}
+		\end{minted}
+	\end{minipage}
+	\caption{Security invariants checking example}
+	\label{lst:example6}
+\end{listing}
+
+The bug here is obvious -- the \texttt{data} array is only 64 bytes long, but the condition \texttt{index < 74} checks that the index is less than 74. This means that any index greater than 63 would trigger an out-of-bounds write. With the automatic security invariant checking, we can check if it is possible to generate such an input that would trigger the vulnerability.
+
+One particular example of a tool that implements this technique is Sydr. In the paper \textit{Symbolic Security Predicates: Hunt Program Weaknesses} \cite{sydr-symbolic-security-predicates}, the authors proposed a technique called \textit{symbolic security predicates} that allows for automatic security invariant checking.
 
 \subsubsection{Challenges}
 
-\begin{itemize}
-	\item Infinite execution path
-	\item Unsolvable constraints
-	\item Symbolic modeling (syscalls, external function calls, etc.)
-\end{itemize}
+While symbolic execution provides a lot of benefits, it also comes with a handful of challenges.
+
+\newparagraph{Symbolic Memory}
+
+One of the main challenges of symbolic execution is the ability to build a precise symbolic model of the program. While modeling simple program with scalar values is relatively easy, modeling memory with pointer operations introduces a new level of indirection that makes the process much more difficult. Additionally, performance drops significantly due to the substantial increase in formula size and complexity when compared to scalar-only modes.
+
+Another crucial aspect of the challenge is determining approximate or exact boundaries for symbolic memory accesses. In general case, a symbolic memory dereference could access any memory location, which is infeasible to model. Therefore, we must find a way to limit memory access to a specific range. For instance, in the paper \textit{Towards Symbolic Pointers Reasoning in Dynamic Symbolic Execution} \cite{symbolic-pointers-reasoning}, the authors study this problem and explore various techniques to address it. One approach proposed involves the use of heuristics to determine the leftmost boundary by extracting the concrete portion from the abstract syntax tree of the address expression.
+
+\newparagraph{Unsolvable Constraints}
+
+Another challenge arises from the fact that modern SMT solvers are not perfect at solving all SMT problems efficiently. The SMT problem is known to be NP-complete, which means there is no known algorithm that can solve all SMT problems efficiently. As a result, although modern SMT solvers can handle many real-world problems, there are still scenarios where the solver may fail to find a solution or take an excessively long time to do so. This limitation can hamper the performance and effectiveness of the symbolic execution process.
+
+\newparagraph{Incomplete Symbolic Model}
+
+Additional obstacle of symbolic execution is the potential incompleteness of the symbolic model. It may not always be possible or practical to completely model a program symbolically, especially when dealing with interactions with the outside world, such as system calls. This can result in discrepancies between the symbolic program state and the real one, leading to unsolvable constraints that impede the effectiveness of the technique. However, some approaches, such as concolic testing, can help mitigate this challenge by combining symbolic and concrete execution.
+
+\newparagraph{Path Explosion}
+
+Finally, a significant challenge in various types of program analysis, including symbolic execution, fuzzing, and path-sensitive static analysis, is the path explosion problem. This issue arises because the number of control-flow paths in a program increases exponentially with the program's size. As a result, the symbolic execution engine may not be able to explore all the paths within a reasonable timeframe. To overcome this challenge, researchers have proposed various techniques, such as path pruning and constraint prioritization, that aim to reduce the number of explored paths without compromising the completeness of the analysis. However, these techniques have their limitations, and achieving complete path coverage remains a challenging problem in program analysis.
 
 \subsection{Hybrid Fuzzing}
 
+% Symbolic execution is shown to be a powerful technique for program analysis. However, it is not without its limitations. One of the main challenges of symbolic execution is the path explosion problem. As the number of paths in a program increases exponentially with the program's size, the symbolic execution engine may not be able to explore all the paths within a reasonable timeframe. To overcome this challenge, researchers have proposed various techniques, such as path pruning and constraint prioritization, that aim to reduce the number of explored paths without compromising the completeness of the analysis. However, these techniques have their limitations, and achieving complete path coverage remains a challenging problem in program analysis.
+
 One of the first attempts to combine symbolic execution was presented as a \cite{driller-ndss16}
+
+\subsubsection{Examples}
