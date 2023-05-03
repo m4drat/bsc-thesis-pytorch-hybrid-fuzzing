@@ -13,7 +13,7 @@ In this section, we will provide an overview of static analysis and then delve i
 
 \subsection{Static Analysis}
 
-A set of techniques known as static analysis involves analyzing the source code of a program without executing it. This approach allows to detect a wide range of problems in the code, potentially examining all possible execution paths.
+A set of techniques known as static analysis involves analyzing the source code of a program without executing it. This approach allows us to detect a wide range of problems in the code, potentially examining all possible execution paths.
 
 Although static analysis tends to be more exhaustive, it suffers a lot from false positives as well as false negatives. Furthermore, static analysis tends to be very slow and resource-intensive, especially for large codebases.
 
@@ -151,36 +151,66 @@ Symbolic interpretation, also known as symbolic execution, aims to solve the pro
 
 Essentially, symbolic execution is a powerful technique that enables us to run a program with symbolic inputs instead of concrete ones. By treating program states as sets of constraints on these inputs, we can systematically explore different paths through the code and generate new test cases that can reveal hidden bugs.
 
-For example, the state of the program in Listing \ref{lst:example3} can be defined by this equation: \mintinline{python}{key * 0xa9a57b = 0x1337beef}. Depending on whether this equation is satisfied or not, we either take the \texttt{true} or the \texttt{false} branch. By solving this equation, we can generate an input that would open up the \texttt{true} branch, and thus trigger the \texttt{error()} function. For this particular example, the input \mintinline{python}{0x1337beef / 0xa9a57b = 0x1d} would satisfy the equation and trigger the error.
+For example, the state of the program in Listing \ref{lst:example3} can be defined by this equation: \mintinline{python}{key * 0xa9a57b = 0x1337beef}. Depending on whether this equation is satisfied or not, we either take the \texttt{true} or the \texttt{false} branch. By solving this equation, we can generate an input that would open up the \texttt{true} branch, and thus trigger the \texttt{error()} function. For this particular example, the input \mintinline{python}{0x1337beef / 0xa9a57b = 0x1d} would satisfy the equation and trigger the error. What is notable, for classical fuzzers, it would require exhaustively testing all possible inputs to find this one, as there is no feedback which would guide the fuzzer towards this input.
 
 Now that we have covered the fundamentals of symbolic execution, let us delve deeper into the various components of the symbolic execution process.
 
 \subsubsection{Symbolic Representation}
 
-Symbolic representation is the first step in the symbolic execution process. It involves representing the program variables and inputs as symbolic expressions, which can then be manipulated and evaluated mathematically.
+Symbolic representation is the initial stage of the symbolic execution process where program variables and inputs are represented as symbolic expressions that can be mathematically evaluated and manipulated.
+
+To effectively build and update a program's symbolic state based on the instruction semantics, it is necessary to symbolically execute machine code instructions while simultaneously updating the symbolic state. A convenient approach is to use a dynamic binary analysis framework, such as Triton \cite{triton-sstic2015}, which provides an API for symbolic execution and allows us to easily build symbolic expressions from machine code instructions.
+
+In the Listing \ref{lst:example4}, we can see an example of how Triton can be used to symbolically execute a program from Listing \ref{lst:example3}, and generate an equation for the conditional jump instruction.
+
+% an input that would trigger the \texttt{error()} function.
 
 \begin{listing}[htp]
 	\centering
-	\begin{minipage}{.6\linewidth}
-		\begin{minted}[linenos=true, tabsize=4]{c}
-void vuln(int key) {
-	if (key * 0xa9a57b == 0x1337beef) {
-		error();
-	}
-}
-		\end{minted}
+	\begin{minipage}{.9\linewidth}
+		\begin{minted}[linenos=true, tabsize=4, breaklines=true, fontsize=\small]{python}
+from triton import *
+
+>>> # Create the Triton context with a defined architecture
+>>> ctx = TritonContext(ARCH.X86_64)
+
+>>> # Symbolize data (optional)
+>>> ctx.symbolizeRegister(ctx.registers.eax, 'sym_eax')
+
+>>> # Execute instructions
+>>> ctx.processing(Instruction(b"\xb9\x7b\xa5\xa9\x00")) # mov ecx, 0xa9a57b
+>>> ctx.processing(Instruction(b"\xf7\xe1"))             # mul ecx
+>>> ctx.processing(Instruction(b"\x3d\xef\xbe\x37\x13")) # cmp eax, 0x1337beef
+
+>>> # Get the symbolic expression
+>>> zf_expr = ctx.getSymbolicRegister(ctx.registers.zf)
+>>> print(zf_expr)
+(define-fun ref!14 () (_ BitVec 1) (ite (= ref!8 (_ bv0 32)) (_ bv1 1) (_ bv0 1))) ; Zero flag
+
+>>> # Solve constraint
+>>> ctx.getModel(zf_expr.getAst() == 0x1)
+{0: sym_eax:32 = 0x1d}
+
+>>> # 0x1d * 0xa9a57b is indeed equal to 0x1337beef
+>>> hex(0x1d * 0xa9a57b)
+'0x1337beef'
+	\end{minted}
 	\end{minipage}
 	\caption{Triton API example}
 	\label{lst:example4}
 \end{listing}
 
-\cite{triton-sstic2015}
+Triton provides a powerful mechanism for interpreting machine code instructions and updating the symbolic state simultaneously. However, it may not be able to handle certain scenarios such as external library calls or complex OS-dependent instructions like \texttt{syscall}. In such cases, it may be necessary to actually run the program and symbolically execute as much as possible, while concretizing the remaining instructions that cannot be symbolically executed.
 
-\subsubsection{Constraints Collection}
+This approach is widely used by many symbolic execution engines, such as QSym \cite{qsym-usenix2018} and Sydr.
+
+So, we have a way to maintain symbolic state
+
+\subsubsection{Dynamic Constraints Collection}
 
 % bochs, Frida, QEMU, QBDI, tinyinst
 
-dynamorio \cite{dynamorio-thesis}, pintool \cite{pintool-2005}, QEMU \cite{qemu-usenix2005}
+Dynamorio \cite{dynamorio-thesis}, pintool \cite{pintool-2005}, QEMU \cite{qemu-usenix2005}
 
 \subsubsection{Constraints Solving}
 
