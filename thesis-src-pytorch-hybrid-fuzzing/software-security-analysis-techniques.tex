@@ -241,7 +241,7 @@ With the ability to symbolically execute a program and generate new inputs that 
 
 First, we can automatically generate inputs that would open up new paths in the program. This allows us to explore different program states and as a result, test different aspects of the program. This is called \textit{path exploration} and is one of the main benefits that symbolic execution provides.
 
-The second benefit is the ability to not only explore different paths, but also to check security invariants. For example, we can check if a specific code location is reachable, or if a specific condition can be satisfied. This is called \textit{security invariant checking} and is another key benefit of symbolic execution. This technique allows us to check if a specific vulnerability can be triggered, for example, if it is possible to generate such an input that would trigger an out-of-bounds access. Consider the example from Listing \ref{lst:example6}.
+The second benefit of symbolic execution is the ability to not only explore various execution paths but also to verify security invariants. With this technique, we can analyze whether a particular code location is reachable and if a given condition can be met. By employing this approach, we can identify potential vulnerabilities and evaluate if a particular input can trigger them. For instance, we can examine whether it is possible to generate an input that triggers an out-of-bounds access, as demonstrated in the code example presented in Listing \ref{lst:example6}.
 
 \begin{listing}[htp]
 	\centering
