@@ -103,7 +103,7 @@ The natural modularity of the fuzzing process has proven to be beneficial, as sh
 
 \subsubsection{Individual Fuzzer Components}
 
-To further understand the different techniques used by fuzzers, let's take a look at some papers that focus on individual components of the fuzzing process.
+To further understand the different techniques used by fuzzers, let us take a look at some papers that focus on individual components of the fuzzing process.
 
 One important component is the mutation engine used to generate new inputs from existing ones. In the paper \cite{redqueen-ndss19}, the authors propose a new mutation strategy called Redqueen, which utilizes feedback from previous executions to build input-to-state correspondence. This allows Redqueen to solve simple comparison-based constraints, such as the one in the Listing \ref{lst:example2}, assuming the input-to-state mapping is one-to-one.
 
@@ -122,9 +122,9 @@ if (strcmp(buf, "FuZzing1sC00L") == 0) {
 
 Another important component is the input selection strategy. In the paper \cite{effective-seed-scheduling-for-fuzzing-with-graph-centrality-analysis}, the authors propose a new seed selection strategy called \textit{K-Scheduler}, which uses graph centrality analysis to select seeds that are more likely to increase feature coverage. The authors show that this strategy outperforms other seed selection strategies, such as \textit{Entropic}, or next-best AFL-based seed scheduler \textit{RarePath} by 25.89\% and 4.21\%, respectively.
 
-\subsubsection{Challenges}
+\subsubsection{Challenges} \label{fuzzing:challenges}
 
-In conclusion, fuzzing has become one of the best techniques to find bugs in software. Through extensive research, various techniques have been developed and applied to different components of the fuzzing process, such as mutation engines, input selection strategies, and others. However, there are many challenges that haven't been solved yet. Ranging from the scalability of fuzzing to the quality of the generated inputs, there are many areas that can be improved.
+In conclusion, fuzzing has become one of the best techniques to find bugs in software. Through extensive research, various techniques have been developed and applied to different components of the fuzzing process, such as mutation engines, input selection strategies, and others. However, there are many challenges that have not been solved yet. Ranging from the scalability of fuzzing to the quality of the generated inputs, there are many areas that can be improved.
 
 One particularly challenging problem is the generation of inputs that satisfy complex constraints. Even with the most advanced fuzzers, it is still difficult, if not impossible, to generate inputs that satisfy constraints such as the one in Listing \ref{lst:example3}. This happens because the constraints may involve complex arithmetic operations, or other hard-to-resolve dependencies between input values. As a result, traditional fuzzing techniques that rely on random or mutation-based input generation with coverage feedback are not sufficient to solve this problem.
 
@@ -262,7 +262,7 @@ The bug here is obvious -- the \texttt{data} array is only 64 bytes long, but th
 
 One particular example of a tool that implements this technique is Sydr. In the paper \textit{Symbolic Security Predicates: Hunt Program Weaknesses} \cite{sydr-symbolic-security-predicates}, the authors proposed a technique called \textit{symbolic security predicates} that allows for automatic security invariant checking.
 
-\subsubsection{Challenges}
+\subsubsection{Challenges} \label{symbolic_execution:challenges}
 
 While symbolic execution provides a lot of benefits, it also comes with a handful of challenges.
 
@@ -286,8 +286,32 @@ Finally, a significant challenge in various types of program analysis, including
 
 \subsection{Hybrid Fuzzing}
 
-% Symbolic execution is shown to be a powerful technique for program analysis. However, it is not without its limitations. One of the main challenges of symbolic execution is the path explosion problem. As the number of paths in a program increases exponentially with the program's size, the symbolic execution engine may not be able to explore all the paths within a reasonable timeframe. To overcome this challenge, researchers have proposed various techniques, such as path pruning and constraint prioritization, that aim to reduce the number of explored paths without compromising the completeness of the analysis. However, these techniques have their limitations, and achieving complete path coverage remains a challenging problem in program analysis.
+As we have seen in the previous sections (\ref{fuzzing:challenges}, \ref{symbolic_execution:challenges}), both fuzzing and symbolic execution have their strengths and weaknesses. One of the main problems of fuzzing is the inability to generate complex inputs, while symbolic execution suffers from the path explosion problem, and execution speed.
 
-One of the first attempts to combine symbolic execution was presented as a \cite{driller-ndss16}
+To overcome the limitations of both techniques, researchers have proposed a hybrid approach called \textit{hybrid fuzzing}. Hybrid fuzzing combines fuzzing and symbolic execution to take advantage of their strengths and mitigate their weaknesses. In this approach, the fuzzer generates inputs and feeds them into the symbolic execution engine. The symbolic execution engine then explores the different paths in the program, thus helping the fuzzer to explore new code paths.
 
-\subsubsection{Examples}
+The primary benefit of hybrid fuzzing is that it is no longer limited by the fuzzer's inability to generate complex inputs. With the help of symbolic execution, the fuzzer can generate inputs that could pass complex checks and open up new paths in the program, leading to better code coverage and more thorough testing. Additionally, the symbolic execution engine can also help identify potential vulnerabilities by checking security invariants.
+
+\subsubsection{Approaches}
+
+One of the first tools to implement this approach was SAGE \cite{sage-acm-2012}, which was later improved upon by Driller. In the paper \textit{Driller: Augmenting Fuzzing Through Selective Symbolic Execution} \cite{driller-ndss16}, the authors introduced a technique called \textit{selective symbolic execution}. This technique enables the exploration of only the paths that are important to the fuzzer and generates inputs for conditions that are challenging for the fuzzer to solve independently.
+
+The approach employed by Driller is relatively straightforward. Symbolic execution engine is executed only if the fuzzer is unable to produce new code coverage for a given period of time. While this approach is effective to some extent, recent studies have revealed that the optimal approach is to generate inputs concurrently with the fuzzer. This concurrent input generation approach is currently the standard in modern hybrid fuzzers, including QSYM, SymQEMU, and Sydr.
+
+\newparagraph{SymCC + AFL}
+
+\cite{symcc-usenix-2020}
+
+\newparagraph{QSym + AFL}
+
+\cite{qsym-usenix2018}
+
+\newparagraph{SymQEMU/Fuzzolic + AFL}
+
+\cite{fuzzolic-hybrid-fuzzer}
+
+\cite{symqemu-ndss-2021}
+
+\newparagraph{Sydr + AFL++/LibFuzzer}
+
+\cite{sydr-cutting-edge-dynamic-symbolic-execution}
