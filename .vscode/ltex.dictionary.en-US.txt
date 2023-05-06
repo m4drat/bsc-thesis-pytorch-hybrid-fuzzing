@@ -33,3 +33,4 @@ SymQEMU
 SymCC
 de-facto
 QSYM
+Sydr-fuzz

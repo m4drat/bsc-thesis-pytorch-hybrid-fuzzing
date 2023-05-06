@@ -4,5 +4,12 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"grammarly.selectors": [
+			{
+				"language": "latex",
+				"scheme": "file"
+			}
+		]
+	}
 }
