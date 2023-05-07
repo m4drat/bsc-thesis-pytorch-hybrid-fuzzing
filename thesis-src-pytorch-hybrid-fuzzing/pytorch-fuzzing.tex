@@ -1,6 +1,144 @@
 \section{PyTorch Fuzzing}
 
-We now describe our PyTorch fuzzing methodology. We begin by describing our approach to analyzing PyTorch's attack surface
+PyTorch is a popular open-source machine-learning framework that has gained immense popularity in recent years. Developed by Meta (formerly Facebook), PyTorch has emerged as one of the most widely used machine learning frameworks due to its ease of use, flexibility, and dynamic computational graph, making it a popular choice for researchers and developers alike.
+
+PyTorch is a critical component of many applications across various industries such as banking, healthcare, insurance, and many others. It is used for natural language processing, image classification, speech recognition, and other tasks. In banking, PyTorch is used to develop fraud detection systems, while in healthcare, it is used to diagnose diseases and predict patient outcomes. The insurance industry uses PyTorch to analyze risk and predict losses. The flexibility of PyTorch enables it to be used in many other domains as well. PyTorch has been used to build many state-of-the-art machine learning models and is a vital tool in the field of deep learning.
+
+Despite its popularity and usefulness, PyTorch has several challenges that must be addressed to ensure its reliability and security. PyTorch has multiple dependencies, and it includes a considerable amount of C/C++ code which implies that it is susceptible to memory safety vulnerabilities. Moreover, PyTorch is an interesting target for adversaries since it is used in critical applications. Therefore, it is crucial to ensure that PyTorch is secure and free from vulnerabilities. Fuzzing is a valuable technique that can help identify bugs and vulnerabilities in PyTorch, making it more robust and secure. By fuzzing PyTorch, we can ensure that it can withstand attacks and continue to operate correctly in real-world applications.
+
+In this chapter, we will explore the concept of PyTorch fuzzing and its significance in improving the reliability and security of PyTorch. We will begin by describing its attack surface. We will then develop fuzzing harnesses for the interesting parts of the codebase. Finally, we will describe the fuzzing methodology and the results of our work.
 
 \subsection{Attack Surface Mapping}
+
+To begin our fuzzing efforts, we must first identify the attack surface of PyTorch. The attack surface refers to all the entry points through which an attacker can potentially interact with the system and launch an attack. In the case of PyTorch, its attack surface includes various modules, libraries, and dependencies that it uses.
+
+To identify interesting parts of the codebase that are relevant to the attack surface, we have performed manual code analysis. Our analysis has highlighted several modules that are particularly interesting to fuzz, including the model loading and RPC communications modules.
+
+\subsubsection{Model Loading}
+
+The process of loading pre-trained models is a crucial entry point that attackers can exploit to gain access to the system. This process is typically handled by the model loading module, which can be accessed via the \texttt{torch.load()} function.
+
+During the loading process, the \texttt{torch.load()} function goes through several deserialization steps, also known as unpickling, to recreate the original object from the byte stream. Deserialization is a common source of vulnerabilities in many applications, as it can be difficult to implement correctly. Unfortunately, PyTorch is not immune to this issue. Additionally, since the implementation is written in C++, it is even more susceptible to memory safety vulnerabilities.
+
+The code responsible for model loading and parsing is mostly located in these files:
+
+\begingroup
+\begin{itemize}
+    \item jit/serialization/import.cpp
+    \item jit/ir/irparser.cpp
+    \item jit/serialization/unpickler.cpp
+    \item jit/runtime/interpreter.cpp
+    \item jit/frontend/schema\_type\_parser.cpp
+\end{itemize}
+\endgroup
+
+\subsubsection{Remote Communications (RPC)}
+
+Besides model loading, PyTorch has another interesting mechanism that attackers can exploit - the RPC communications module.
+
+The RPC module in PyTorch is a complex system that opens up new, remotely accessible attack vectors. PyTorch uses the RPC module to implement distributed training and inference that allows users to train and execute models across multiple machines. This feature is essential for large-scale applications that require high computational power. However, it increases the security risks by creating additional entry points for attackers.
+
+PyTorch uses various types of RPCs such as \texttt{RRef} (Remote Reference),\\ \texttt{ScriptCall}, and others to interact with remote machines. Before sending RPCs, they are serialized into pickled objects using the \texttt{torch::jit::pickle} function. The RPCs are then sent using different backends like TensorPipe, Gloo, and MPI. Once received, the RPCs are deserialized using the \texttt{torch::jit::unpickle} function, and the target \texttt{Message}'s class \texttt{fromMessage()} method is called. This leaves the receiver with a plain message that can be further processed.
+
+Unfortunately, the complexity of this system makes it prone to bugs and vulnerabilities. Multiple serializations and deserializations of messages can introduce bugs, and the fact that the RPC protocol is implemented in C++ makes it an attractive target to look for memory safety vulnerabilities. Moreover, given the memory-unsafe nature of the RPC protocol, a single bug could potentially allow an attacker to execute code remotely on a target machine. As a result, fuzzing the RPC module is highly recommended to identify and address potential vulnerabilities.
+
+With that in mind, we have identified the following files as the most interesting targets for security research:
+
+\begingroup
+\begin{itemize}
+    \item distributed/rpc/*.cpp
+    \item jit/serialization/unpickler.cpp
+\end{itemize}
+\endgroup
+
+\subsubsection{Finding Fuzz-Targets}
+
+Now that we have identified different parts of the PyTorch codebase that are relevant to the attack surface, we can proceed to the second part of the attack surface mapping - identifying specific functions and methods to fuzz.
+
+To achieve this, we have used two different approaches:
+
+\begin{enumerate}
+    \item \textbf{Manual code review} - we have performed a manual code review of the PyTorch codebase to identify relevant functions that are confined to the defined attack surface.
+    \item \textbf{CodeQL} - we have used CodeQL \cite{ql-object-oriented-queries-on-relational-data} to broadly search for interesting functions and methods that perform some kind of deserialization or parsing.
+\end{enumerate}
+
+The first approach is straightforward and does not require any additional tools. However, it is time-consuming and requires a lot of manual work. Nevertheless, it yields the best results since it allows us to precisely identify the functions that might be interesting to fuzz.
+
+The second approach lacks "precision" but can be automated and scaled to a large codebase. It allows us to quickly identify a narrowed-down set of functions that are worth looking into. However, it is not as precise as the first approach since it relies on heuristics and does not "understand" the code. As a result, it can miss some relevant functions. Nevertheless, it is a good starting point for fuzzing since it can help identify interesting functions that can be further analyzed manually.
+
+To begin with, we employed the second approach to pinpoint some specific functions that are worth looking into. We developed a CodeQL query \ref{appendix:codeql-query} that searches for functions that have two parameters:
+
+\begin{enumerate}
+    \item The first parameter is a pointer to data of "parsable" types. For example - \texttt{char*}, \texttt{byte*}, and others.
+    \item The second parameter is an integer that represents the size of the data. For example - \texttt{int}, \texttt{size\_t}, and others.
+\end{enumerate}
+
+With that in place, we added a few more heuristics to filter out irrelevant functions. Finally, we used \textit{Cyclomatic Complexity} \cite{cyclomatic-complexity-density} to rank the results and identify the most complex functions. Some results of the query are shown in Table \ref{table:codeql-results}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{cl}
+        \toprule
+        \textbf{Complexity} & \textbf{Function}                      \\
+        13                  & \texttt{rpc::parseWireSections}        \\
+        6                   & \texttt{Unpickler::readSlowWithBuffer} \\
+        5                   & \texttt{TokenTrie::insert}             \\
+        4                   & \texttt{rpc::wireDeserialize}          \\
+        \bottomrule
+    \end{tabular}
+    \caption{CodeQL query results}
+    \label{table:codeql-results}
+\end{table}
+
+These results gave us a good starting point. From here, we manually reviewed the functions and started to study the codebase, employing the first approach.
+
+Finally, we have compiled a list of the most interesting functions that are worth fuzzing. The list is shown in Table \ref{table:fuzz-targets}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{cl}
+        \toprule
+        \textbf{Function}                 \\
+        \texttt{jit::parseIR}             \\
+        \texttt{jit::load}                \\
+        \texttt{rpc::deserializeResponse} \\
+        \texttt{rpc::deserializeRequest}  \\
+        \bottomrule
+    \end{tabular}
+    \caption{Fuzz targets}
+    \label{table:fuzz-targets}
+\end{table}
+
+The first two functions are related to the JIT module and are responsible for parsing and loading the pickled data. Some examples of such data are: \texttt{saved models}, \texttt{serialized request}, and others.
+
+The last two functions are related to the RPC module and are responsible for deserializing RPC requests and responses. These functions are interesting because they are directly processing untrusted data that is received from the network.
+
 \subsection{Fuzzing Harness Development}
+
+Now,
+
+\subsection{Fuzzing Methodology}
+
+\subsubsection{Preparing for Fuzzing}
+
+\subsubsection{Dynamic analysis pipeline}
+
+\newparagraph{Hybrid Fuzzing}
+\newparagraph{Fuzzing-corpus minimization}
+\newparagraph{Security Invariants Verification}
+\newparagraph{Crashes Processing}
+\newparagraph{Fuzz-campaign Assessment}
+
+\subsection{Results Overview}
+
+As a result of our work, 5 pull requests were created and merged into the PyTorch repository. The pull requests are listed below:
+
+\begin{itemize}
+    \item \href{https://github.com/pytorch/pytorch/pull/94300}{\#94300: Add size check before calling stack\_.at(dict\_pos) in unpickler.cpp}
+    \item \href{https://github.com/pytorch/pytorch/pull/94298}{\#94298: Add stack emptiness checks inside interpreter.cpp}
+    \item \href{https://github.com/pytorch/pytorch/pull/94297}{\#94297: Add size check before calling .back() in rpc/script\_call.cpp}
+    \item \href{https://github.com/pytorch/pytorch/pull/94295}{\#94295: Add exception handlers for stoll in schema\_type\_parser.cpp}
+    \item \href{https://github.com/pytorch/pytorch/pull/91401}{\#91401: Add out-of-bounds checks inside irparser.cpp and unpickler.cpp}
+\end{itemize}
+
+In section \ref{results:pytorch-bugs}, we will take a closer look at the bugs we found and the pull requests we created.

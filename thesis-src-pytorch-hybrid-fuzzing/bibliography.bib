@@ -16,6 +16,48 @@
   note         = {Accessed: 2023-03-14}
 }
 
+@misc{pytorch-pr-94300-size-check-unpickler,
+  howpublished = {\url{https://github.com/pytorch/pytorch/pull/94300}},
+  title        = {PyTorch: pull-request "Add size check before calling stack_.at(dict_pos) in unpickler.cpp"},
+  note         = {Accessed: 2023-05-01}
+}
+
+@misc{pytorch-pr-94298-emptiness-check-interpreter,
+  howpublished = {\url{https://github.com/pytorch/pytorch/pull/94298}},
+  title        = {PyTorch: pull-request "Add stack emptiness checks inside interpreter.cpp"},
+  note         = {Accessed: 2023-05-01}
+}
+
+@misc{pytorch-pr-94297-size-check-rpc-script-call,
+  howpublished = {\url{https://github.com/pytorch/pytorch/pull/94297}},
+  title        = {PyTorch: pull-request "Add size check before calling .back() in rpc/script_call.cpp"},
+  note         = {Accessed: 2023-05-01}
+}
+
+@misc{pytorch-pr-94295-exception-handlers-schema-type-parser,
+  howpublished = {\url{https://github.com/pytorch/pytorch/pull/94295}},
+  title        = {PyTorch: pull-request "Add exception handlers for stoll in jit/frontend/schema_type_parser.cpp"},
+  note         = {Accessed: 2023-05-01}
+}
+
+@misc{pytorch-pr-91401-oob-checks-irparser-unpickler,
+  howpublished = {\url{https://github.com/pytorch/pytorch/pull/91401}},
+  title        = {PyTorch: pull-request "Add out of bounds checks inside irparser.cpp and unpickler.cpp"},
+  note         = {Accessed: 2023-05-01}
+}
+
+@article{ql-object-oriented-queries-on-relational-data,
+  title        = {QL: Object-oriented Queries on Relational Data},
+  url          = {http://drops.dagstuhl.de/opus/volltexte/2016/6096/},
+  doi          = {10.4230/LIPICS.ECOOP.2016.2},
+  abstractnote = {This paper describes QL, a language for querying complex, potentially recursive data structures. QL compiles to Datalog and runs on a standard relational database, yet it provides familiar-looking object-oriented features such as classes and methods, reinterpreted in logical terms: classes are logical properties describing sets of values, subclassing is implication, and virtual calls are dispatched dynamically by considering the most specific classes containing the receiver. Furthermore, types in QL are prescriptive and actively influence program evaluation rather than just describing it. In combination, these features enable the development of concise queries based on reusable libraries, which are written in a purely declarative style, yet can be efficiently executed even on very large data sets. In particular, we have used QL to implement static analyses for various programming languages, which scale to millions of lines of code.},
+  journal      = {Schloss Dagstuhl - Leibniz-Zentrum fuer Informatik GmbH, Wadern/Saarbruecken, Germany},
+  publisher    = {Schloss Dagstuhl - Leibniz-Zentrum fuer Informatik GmbH, Wadern/Saarbruecken, Germany},
+  author       = {Avgustinov, Pavel and De Moor, Oege and Jones, Michael Peyton and Schäfer, Max},
+  year         = {2016},
+  language     = {en}
+}
+
 @incollection{pytorch,
   title     = {PyTorch: An Imperative Style, High-Performance Deep Learning Library},
   author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Kopf, Andreas and Yang, Edward and DeVito, Zachary and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
@@ -506,4 +548,15 @@
   title     = {KLEE: Unassisted and Automatic Generation of High-Coverage Tests for Complex Systems Programs.},
   url       = {http://dblp.uni-trier.de/db/conf/osdi/osdi2008.html#CadarDE08},
   year      = 2008
+}
+
+@article{cyclomatic-complexity-density,
+  author  = {Gill, G.K. and Kemerer, C.F.},
+  journal = {IEEE Transactions on Software Engineering},
+  title   = {Cyclomatic complexity density and software maintenance productivity},
+  year    = {1991},
+  volume  = {17},
+  number  = {12},
+  pages   = {1284-1288},
+  doi     = {10.1109/32.106988}
 }

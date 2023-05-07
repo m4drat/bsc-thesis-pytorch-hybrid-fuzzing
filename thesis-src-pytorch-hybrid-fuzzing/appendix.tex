@@ -1,0 +1,65 @@
+\appendix
+
+\section{CodeQL query} \label{appendix:codeql-query}
+
+\renewcommand\theFancyVerbLine{\footnotesize\arabic{FancyVerbLine}}
+\newenvironment{code}{\captionsetup{type=listing}}{}
+
+\begin{code}
+    \begin{minted}[linenos=true, tabsize=4, breaklines=true, fontsize=\footnotesize]{python3}
+import cpp
+import semmle.code.cpp.dataflow.DataFlow
+import semmle.code.cpp.security.Overflow
+import semmle.code.cpp.metrics.MetricFunction
+import semmle.code.cpp.Print
+
+predicate goodFile(MetricFunction mf) {
+    not (
+        mf.getFile().getAbsolutePath().toString().regexpMatch(".*.pb.cc") or
+        mf.getFile().getAbsolutePath().toString().regexpMatch(".*.pb.h") or
+        mf.getFile().getAbsolutePath().toString().regexpMatch(".*variant.h") or
+        mf.getFile().getAbsolutePath().toString().regexpMatch(".*third_party.*") or
+        mf.getFile().getAbsolutePath().toString().regexpMatch("/usr/include/.*") or
+        mf.getFile().getAbsolutePath().toString().regexpMatch("/usr/lib/.*") or
+        mf.getFile().getAbsolutePath().toString().regexpMatch(".*TypeCast.h") or
+        mf.getFile().getAbsolutePath().toString().regexpMatch(".*/ATen/cpu/vec/.*")
+    )
+}
+
+predicate libfuzzerFuzzable(MetricFunction mf) {
+    mf.getNumberOfParameters() = 2 and
+    mf.getAParameter().getUnderlyingType() instanceof IntegralType and
+    exists(PointerType ptr |
+        ptr = mf.getAParameter().getUnderlyingType() and
+        ptr.getUnderlyingType().getName().regexpMatch(".*(char|int|byte|void)+.*")
+    )
+}
+
+int getComplexity(MetricFunction mf) {
+    result = mf.getCyclomaticComplexity()
+}
+
+predicate goodName(MetricFunction mf) {
+    not (
+        mf.getName().regexpMatch(".*parallel_for.*") or
+        mf.getName().regexpMatch(".*_PlacementNew.*") or
+        mf.getName().regexpMatch(".*_PlacementDelete.*") or
+        mf.getName().regexpMatch("xnn_.*") or
+        mf.getName().regexpMatch("Sleef_.*") or
+        mf.getName().regexpMatch("_M_.*")
+    )
+}
+
+from MetricFunction mf, int cc
+where
+    cc = getComplexity(mf) and
+    goodFile(mf) and
+    goodName(mf) and
+    libfuzzerFuzzable(mf)
+select "Complexity: ", cc, "Function: ", mf, "Declaration", mf.getFullSignature(), "File: ",
+    mf.getFile() order by cc desc
+\end{minted}
+    \caption{CodeQL query used to find fuzzable functions in PyTorch.}
+\end{code}
+
+\section{Fuzzbench results} \label{appendix:fuzzbench-results}
