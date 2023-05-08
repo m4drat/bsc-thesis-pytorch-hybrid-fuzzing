@@ -12,7 +12,6 @@
 \usepackage{setspace}
 \usepackage{graphicx}
 \usepackage{colortbl}
-\usepackage{tikz}
 \usepackage{pgf}
 \usepackage{subcaption}
 \usepackage{enumitem}
@@ -27,6 +26,14 @@
 \usepackage{lstfiracode}
 \usepackage{xcolor}
 \usepackage[ruled,linesnumbered]{algorithm2e}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\usetikzlibrary{graphs}
+
+\tikzstyle{initialstage} = [rectangle, rounded corners=0.1cm, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!30]
+\tikzstyle{stage} = [rectangle, rounded corners=0.1cm, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
 
 \usepackage{minted}
 \usemintedstyle{tango}
