@@ -63,3 +63,60 @@ select "Complexity: ", cc, "Function: ", mf, "Declaration", mf.getFullSignature(
 \end{code}
 
 \section{Fuzzbench results} \label{appendix:fuzzbench-results}
+
+\begin{figure}[b]
+    \centering
+    \resizebox{\columnwidth}{!}{%
+        \begin{tabular}{cc}
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-15-1/freetype2-2017_coverage_growth.png}  & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-15-1/harfbuzz-1.3.2_coverage_growth.png}        \\
+            (a) freetype2                                                                                            & (b) harfbuzz                                                                                                   \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-15-1/lcms-2017-03-21_coverage_growth.png} & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-15-1/libjpeg-turbo-07-2017_coverage_growth.png} \\
+            (c) lcms                                                                                                 & (d) libjpeg                                                                                                    \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-15-1/libpng-1.2.56_coverage_growth.png}   & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-15-1/openthread-2019-12-23_coverage_growth.png} \\
+            (c) libpng                                                                                               & (d) openthread                                                                                                 \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-15-1/sqlite3_ossfuzz_coverage_growth.png} & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-15-1/fuzzbench-legend.png}                      \\
+            (c) sqlite3                                                                                              & (d) legend                                                                                                     \\[6pt]
+        \end{tabular}
+    }
+    \caption{Fuzzbench: Symptr-15-1 coverage growth.}
+    \label{fig:fuzzbench:symptr-15-1}
+\end{figure}
+
+\begin{figure}[b]
+    \centering
+    \resizebox{\columnwidth}{!}{%
+        \begin{tabular}{cc}
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-1/freetype2-2017_coverage_growth.png}  & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-1/harfbuzz-1.3.2_coverage_growth.png}        \\
+            (a) freetype2                                                                                            & (b) harfbuzz                                                                                                   \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-1/lcms-2017-03-21_coverage_growth.png} & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-1/libjpeg-turbo-07-2017_coverage_growth.png} \\
+            (c) lcms                                                                                                 & (d) libjpeg                                                                                                    \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-1/libpng-1.2.56_coverage_growth.png}   & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-1/openthread-2019-12-23_coverage_growth.png} \\
+            (c) libpng                                                                                               & (d) openthread                                                                                                 \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-1/sqlite3_ossfuzz_coverage_growth.png} & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-1/fuzzbench-legend.png}                      \\
+            (c) sqlite3                                                                                              & (d) legend                                                                                                     \\[6pt]
+        \end{tabular}
+    }
+    \caption{Fuzzbench: Symptr-25-1 coverage growth.}
+    \label{fig:fuzzbench:symptr-25-1}
+\end{figure}
+
+\begin{figure}[b]
+    \centering
+    \resizebox{\columnwidth}{!}{%
+        \begin{tabular}{cc}
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/freetype2-2017_coverage_growth.png}  & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/harfbuzz-1.3.2_coverage_growth.png}        \\
+            (a) freetype2                                                                                                  & (b) harfbuzz                                                                                                         \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/lcms-2017-03-21_coverage_growth.png} & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/libjpeg-turbo-07-2017_coverage_growth.png} \\
+            (c) lcms                                                                                                       & (d) libjpeg                                                                                                          \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/libpng-1.2.56_coverage_growth.png}   & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/openthread-2019-12-23_coverage_growth.png} \\
+            (c) libpng                                                                                                     & (d) openthread                                                                                                       \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/re2-2014-12-09_coverage_growth.png}  & \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/sqlite3_ossfuzz_coverage_growth.png}       \\
+            (c) re2                                                                                                        & (d) sqlite3                                                                                                          \\[6pt]
+            \includegraphics[width=0.65\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/fuzzbench-legend.png}                &                                                                                                                      \\
+            (c) legend                                                                                                     &                                                                                                                      \\[6pt]
+        \end{tabular}
+    }
+    \caption{Fuzzbench: Symptr-25-vs-35-2 coverage growth.}
+    \label{fig:fuzzbench:symptr-25-vs-35-2}
+\end{figure}
+
