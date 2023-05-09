@@ -43,8 +43,10 @@ This bug is an interesting example to analyze, as it has the potential to cause 
 
 Another interesting discovery that we made was fixed in pull-request \#91401. We found multiple out-of-bounds accesses in the \textit{irparser} and \textit{unpickler} modules of PyTorch. Of particular interest were the bugs in the \textit{unpickler} module, as they could be triggered by a malicious pickle payload, either by loading a malicious \textit{.pt} model or by parsing a malicious RPC payload sent over the network. Part of the patch for this bug can be seen in Listing \ref{listing:pytorch-bug-91401-patch}.
 
-\begin{code}
-    \begin{minted}[linenos=true, tabsize=2, breaklines=true, fontsize=\small]{diff}
+\begin{listing}
+    \centering
+    \begin{minipage}{0.9\linewidth}
+        \begin{minted}[linenos=true, tabsize=2, breaklines=true, fontsize=\small]{diff}
     case PickleOpCode::NEWOBJ: {
 +     TORCH_CHECK(!stack_.empty(), "Parsing error: stack_ is empty");
       // pop empty tuple, the actual action is stored in the globals_stack_
@@ -59,13 +61,14 @@ Another interesting discovery that we made was fixed in pull-request \#91401. We
       const auto& args = tuple->elements();
       AT_ASSERT(
     \end{minted}
+    \end{minipage}
     \caption{Patch for bug unpickler bugs in \#91401}
     \label{listing:pytorch-bug-91401-patch}
-\end{code}
+\end{listing}
 
 \subsubsection{Positive Hack Days Talk}
 
-Apart from conducting a thorough security analysis of PyTorch and discovering many bugs, our team at ISP RAS has also decided to share our findings and methodology with the security community. We submitted a talk proposal titled "Spotting Bugs in PyTorch with Continuous Fuzzing" to the Positive Hack Days (PHD) 2023 conference organizing committee, and it was accepted. Our talk is scheduled to be presented at the conference in Moscow, Russia on May 19-20, 2023. By sharing our insights with the broader community, we hope to raise awareness about the importance of continuous fuzzing and inspire others to adopt similar approaches in their security analysis efforts.
+Apart from conducting a thorough security analysis of PyTorch and discovering many bugs, we have also decided to share our findings and methodology with the security community. We submitted a talk proposal titled "Spotting Bugs in PyTorch with Continuous Fuzzing" to the Positive Hack Days (PHD) 2023 conference organizing committee, and it was accepted. Our talk is scheduled to be presented at the conference in Moscow, Russia on May 19-20, 2023. By sharing our insights with the broader community, we hope to raise awareness about the importance of continuous fuzzing and inspire others to adopt similar approaches in their security analysis efforts.
 
 In conclusion to this section, we believe that our fuzzing campaign was a success. We were able to find multiple bugs in PyTorch, all of which were confirmed and fixed. We also are going to share our findings with the broader security community by presenting a talk at the Positive Hack Days conference.
 
@@ -151,11 +154,11 @@ From this, we can conclude that the value of $N=25$ is indeed the most optimal f
 
 The last, but not the least contribution of this thesis is the enchantment of security predicates with an improved log annotation mechanism.
 
-To test the performance of the improved annotation mechanism, we have conducted several experiments. These experiments consist of two parts:
+To test the performance of the improved annotation mechanism, we have conducted several experiments, on various types of traces obtained from various programs. These experiments consist of two parts:
 
 \begin{enumerate}
-    \item Comparison of the previous method with the new one on branch traces obtained from the Sydr.
-    \item Comparison of the previous method with the new one on instruction traces also obtained from Sydr.
+    \item Comparison of the previous method with the new one on branch traces obtained with the help of Sydr.
+    \item Comparison of the previous method with the new one on instruction traces also obtained with the help of Sydr.
 \end{enumerate}
 
 The results of the first experiment are shown in Table \ref{table:annotate-branch-traces-10}. In this experiment, both methods were applied to annotate 10 branch traces obtained from the Sydr. The table shows the average time spent on annotation in milliseconds, as well as the standard deviation. The last column shows the performance difference between the two methods, which is calculated as follows:
@@ -221,3 +224,7 @@ As on average instruction traces are much larger than branch traces, some benchm
 \end{table}
 
 For this type of trace, the performance is still incomparably higher than the previous method. The average performance difference is close to 98.7\%.
+
+Overall, the new method is significantly faster than the previous one on all benchmarks. The improvements in this module allow us to substantially improve the performance of the whole verification process.
+
+This concludes the discussion about the results achieved in this thesis.
