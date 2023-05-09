@@ -36,6 +36,8 @@
 \tikzstyle{stage} = [rectangle, rounded corners=0.1cm, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
 \tikzstyle{arrow} = [thick,->,>=stealth]
 
+\newenvironment{code}{\captionsetup{type=listing}}{}
+
 \usepackage{minted}
 \usemintedstyle{tango}
 \renewcommand\theFancyVerbLine{\normalsize\arabic{FancyVerbLine}}
@@ -129,6 +131,6 @@ Hybrid Fuzzing, Program Security, Dynamic Analysis, PyTorch, AI Frameworks Secur
 % 1 command to write all citations into the References
 \printbibliography[heading=bibintoc]   % [] are for appearing in Table of Contents
 
-% \include{appendix.tex}
+\include{appendix.tex}
 
 \end{document}

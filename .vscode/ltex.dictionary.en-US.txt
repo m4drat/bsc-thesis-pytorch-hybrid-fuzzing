@@ -73,3 +73,7 @@ deduplication
 clusterization
 casr
 objdump
+libpng
+yices
+yodl
+rizin
