@@ -4,11 +4,64 @@
 
 Based on the findings during this project we've applied to talk at the Positive Hack Days (PHD) 2023 conference. The talk was accepted, and we presented our findings at the conference.
 
-\subsection{1 in 25}
+\subsubsection{\#91999: Case study of a bug in PyTorch}
+\subsubsection{\#91999: Case study of a bug in PyTorch}
 
+\subsection{Experimental Results for the Scheduling Strategy} \label{results:symbolic-pointers-modeling-scheduling}
 
+To assess the quality of proposed changes we have conducted multiple experiments.
 
-\subsection{Annotate}
+The first one: symptr-15-1
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fuzzbench/symptr-15-1/median-relative-code-coverage-on-each-benchmark.png}
+    \caption{Median relative code coverage on each benchmark (N=15)}
+    \label{fig:fuzzbench-symptr-15-1-coverage}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fuzzbench/symptr-15-1/avg-score-avg-rank.png}
+    \caption{Average score and average rank (N=15)}
+    \label{fig:fuzzbench-symptr-15-1-score-rank}
+\end{figure}
+
+The second one: symptr-25-1
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fuzzbench/symptr-25-1/median-relative-code-coverage-on-each-benchmark.png}
+    \caption{Median relative code coverage on each benchmark (N=25)}
+    \label{fig:fuzzbench-symptr-25-1-coverage}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fuzzbench/symptr-25-1/avg-score-avg-rank.png}
+    \caption{Average score and average rank (N=25)}
+    \label{fig:fuzzbench-symptr-25-1-score-rank}
+\end{figure}
+
+\newpage
+
+And, finally, the third one: symptr-25-vs-35-2
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/median-relative-code-coverage-on-each-benchmark.png}
+    \caption{Median relative code coverage on each benchmark (N=25 vs N=35)}
+    \label{fig:fuzzbench-symptr-25-vs-35-2-coverage}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fuzzbench/symptr-25-vs-35-2/avg-score-avg-rank.png}
+    \caption{Average score and average rank (N=25 vs N=35)}
+    \label{fig:fuzzbench-symptr-25-vs-35-2-score-rank}
+\end{figure}
+
+\subsection{Annotate} \label{results:annotate}
 
 \definecolor{Gray}{gray}{0.9}
 \newcolumntype{g}{>{\columncolor{Gray}}c}

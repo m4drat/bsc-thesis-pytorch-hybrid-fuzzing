@@ -124,7 +124,7 @@ Another important component is the input selection strategy. In the paper \cite{
 
 \subsubsection{Challenges} \label{fuzzing:challenges}
 
-In conclusion, fuzzing has become one of the best techniques to find bugs in software. Through extensive research, various techniques have been developed and applied to different components of the fuzzing process, such as mutation engines, input selection strategies, and others. However, there are many challenges that have not been solved yet. Ranging from the scalability of fuzzing to the quality of the generated inputs, there are many areas that can be improved.
+In conclusion, fuzzing has become one of the best techniques to find bugs in software. Through extensive research, various techniques have been developed and applied to different components of the fuzzing process, such as mutation engines, input selection strategies, and others. However, many challenges have not been solved yet. Ranging from the scalability of fuzzing to the quality of the generated inputs, many areas can be improved.
 
 One particularly challenging problem is the generation of inputs that satisfy complex constraints. Even with the most advanced fuzzers, it is still difficult, if not impossible, to generate inputs that satisfy constraints such as the one in Listing \ref{lst:example3}. This happens because the constraints may involve complex arithmetic operations or other hard-to-resolve dependencies between input values. As a result, traditional fuzzing techniques that rely on random or mutation-based input generation with coverage feedback are not sufficient to solve this problem.
 
@@ -151,7 +151,7 @@ Symbolic interpretation, also known as symbolic execution, aims to solve the pro
 
 Essentially, symbolic execution is a powerful technique that enables us to run a program with symbolic inputs instead of concrete ones. By treating program states as sets of constraints on these inputs, we can systematically explore different paths through the code and generate new test cases that can reveal hidden bugs.
 
-For example, the state of the program in Listing \ref{lst:example3} can be defined by this equation: \mintinline{python}{key * 0xa9a57b = 0x1337beef}. Depending on whether this equation is satisfied or not, we either take the \texttt{true} or the \texttt{false} branch. By solving this equation, we can generate an input that would open up the \texttt{true} branch, and thus trigger the \texttt{error()} function. For this particular example, the input \mintinline{python}{0x1337beef / 0xa9a57b = 0x1d} would satisfy the equation and trigger the error. What is notable, for classical fuzzers, it would require exhaustively testing all possible inputs to find this one, as there is no feedback that would guide the fuzzer towards this input.
+For example, the state of the program in Listing \ref{lst:example3} can be defined by this equation: \mintinline{python}{key * 0xa9a57b = 0x1337beef}. Depending on whether this equation is satisfied or not, we either take the \texttt{true} or the \texttt{false} branch. By solving this equation, we can generate an input that would open up the \texttt{true} branch, and thus trigger the \texttt{error()} function. For this particular example, the input \mintinline{python}{0x1337beef / 0xa9a57b = 0x1d} would satisfy the equation and trigger the error. What is notable, for classical fuzzers, it would require exhaustively testing all possible inputs to find this one, as there is no feedback that would guide the fuzzer toward this input.
 
 Now that we have covered the fundamentals of symbolic execution, let us delve deeper into the various components of the symbolic execution process.
 
@@ -266,7 +266,7 @@ One particular example of a tool that implements this technique is Sydr. In the 
 
 While symbolic execution provides a lot of benefits, it also comes with a handful of challenges.
 
-\newparagraph{Symbolic Memory}
+\newparagraph{Symbolic Memory} \label{symbolic_execution:challenges:symbolic_memory}
 
 One of the main challenges of symbolic execution is the ability to build a precise symbolic model of the program. While modeling a simple program with scalar values is relatively easy, modeling memory with pointer operations introduces a new level of indirection that makes the process much more difficult. Additionally, performance drops significantly due to the substantial increase in formula size and complexity when compared to scalar-only modes.
 
@@ -328,7 +328,7 @@ Besides the approximate solver, Fuzzolic is also the first to change the classic
 
 Currently, Fuzzolic is one of the most advanced hybrid fuzzers in terms of performance and versatility. However, it is still in its early stages of development. Nevertheless, it is a promising approach that could potentially become the state-of-the-art solution for hybrid fuzzing.
 
-\newparagraph{Sydr}
+\newparagraph{Sydr} \label{hybrid-fuzzing:sydr}
 
 Lastly, Sydr \cite{sydr-cutting-edge-dynamic-symbolic-execution} is a binary-only dynamic symbolic execution (DSE) tool that employs dynamic binary instrumentation, like SymQEMU and Fuzzolic. However, unlike the SymQEMU or Fuzzolic it instruments the binary using DynamoRIO instead of QEMU. What is also notable is that Sydr separates the concrete executor (tracer) and the symbolic executor (solver) into two separate components, which is similar to Fuzzolic.
 

@@ -150,15 +150,21 @@ The developed fuzzing harnesses are listed below:
     \item \href{https://github.com/ispras/oss-sydr-fuzz/blob/028e36875424aec00ef7375006c413a4be164197/projects/pytorch/jit_differential_fuzz.cc}{\texttt{jit\_differential\_fuzz.cc}} - fuzzes three related methods - \texttt{jit::parseIR}, \texttt{jit::preoptimizeGraph}, and \texttt{jit::InterpreterState(code).run()} with differential fuzzing
 \end{itemize}
 
-However, the development of fuzzing harnesses is only another step toward hybrid fuzzing. The next step is to compile all the necessary build targets and prepare the environment.
+However, the development of fuzzing harnesses is only one more step on the road toward hybrid fuzzing. The next step is to compile all the necessary build targets and prepare the environment.
 
 \subsubsection{Build Targets Compilation}
 
-To meet the requirements of hybrid fuzzing, we need to compile a few different types of build targets.
+To meet the requirements of hybrid fuzzing, we need to prepare a few different types of build targets.
+
+\newparagraph{LibFuzzer Target}
 
 The first one is the fuzz target itself. It is the main entry point for the fuzzer. This target is compiled using the \textit{clang} compiler with the \textit{libFuzzer} library linked. To achieve this, we have added the following compilation flags to the build script: \texttt{-fPIC -g -fsanitize=fuzzer,address,bounds}. To easily distinguish the fuzz target from other targets, we have also added the \texttt{\_fuzz} suffix to the name of the produced binary.
 
+\newparagraph{Sydr Target}
+
 The second type of build target is the plain binary, which reads the data directly from the file and passes it to the fuzz target, without involving the fuzzer. It allows the symbolic execution engine to execute the fuzz target with concrete data. This target is also compiled with the help \textit{clang} compiler, however, the flags are different: \texttt{-fPIC -g}. We have also added the \texttt{\_sydr} suffix to the name of the binary.
+
+\newparagraph{Coverage Target}
 
 And the last type of build target is the binary that is used to collect the coverage information. It is compiled with the \textit{clang} compiler and the following flags: \texttt{-fPIC -g -fprofile-instr-generate -fcoverage-mapping}. As for the previous targets, we have also added the \texttt{\_cov} suffix to the name of the binary.
 
@@ -205,7 +211,7 @@ With everything prepared, we can now proceed to the fuzzing itself. The fuzzing 
 
 \newparagraph{Hybrid Fuzzing}
 
-The first step of the pipeline is hybrid fuzzing. It is performed with the help of the \textit{sydr-fuzz} tool. The tool takes a toml configuration file as input, which contains the information about the fuzzing targets. The configuration file for the \texttt{jit\_differential} target is shown in Listing \ref{listing:jit-differential-config}.
+The first step of the pipeline is hybrid fuzzing. It is performed with the help of the \textit{sydr-fuzz} tool. The tool takes a toml configuration file as input, which specifies the targets to be fuzzed and other parameters. For example, the configuration file for the \texttt{jit\_differential} target is shown in Listing \ref{listing:jit-differential-config}.
 
 \begin{listing}[h]
     \centering
@@ -227,7 +233,7 @@ target = "/jit_differential_cov @@"
     \label{listing:jit-differential-config}
 \end{listing}
 
-The configuration file contains three sections: \texttt{sydr}, \texttt{libfuzzer}, and \texttt{cov}. The \texttt{sydr} section contains information about the target program and how to execute it under the symbolic execution engine. The \texttt{libfuzzer} section contains libfuzzer-related information, such as the path to the fuzz target binary and the arguments that should be passed to it. Finally, the \texttt{cov} section contains information about the coverage target.
+This configuration file contains three sections: \texttt{sydr}, \texttt{libfuzzer}, and \texttt{cov}. The \texttt{sydr} section contains information about the target program and how to execute it under the symbolic execution engine. The \texttt{libfuzzer} section contains libfuzzer-related information, such as the path to the fuzz target binary and the arguments that should be passed to it. Finally, the \texttt{cov} section contains information about the coverage target.
 
 With the configuration file prepared, we can now start the fuzzing campaign. To do so, we need to execute the \textit{sydr-fuzz} binary as follows: \texttt{sydr-fuzz -c jit\_differential.toml run}. The command will start the fuzzing process and will print the results to the console.
 
@@ -267,7 +273,7 @@ This concludes the description of the dynamic analysis pipeline, which has been 
 
 As a result of our work multiple bugs were found in different parts of the PyTorch framework. Most of the bugs were found in the module responsible for unpickling, however, we have also identified at least one remotely-accessible bug in the RPC module.
 
-We have reported all the found bugs to the developers of the PyTorch framework. The developers have confirmed that all the bugs are real, and have merged the corresponding pull requests into the PyTorch repository. The pull requests are listed below:
+We reported all discovered bugs to the PyTorch framework developers, who confirmed their validity and subsequently merged the corresponding pull requests into the PyTorch repository. The pull requests related to the bugs are listed below:
 
 \begin{itemize}
     \item \href{https://github.com/pytorch/pytorch/pull/94300}{\#94300: Add size check before calling stack\_.at(dict\_pos) in unpickler.cpp}

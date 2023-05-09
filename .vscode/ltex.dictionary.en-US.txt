@@ -72,3 +72,4 @@ toml
 deduplication
 clusterization
 casr
+objdump
