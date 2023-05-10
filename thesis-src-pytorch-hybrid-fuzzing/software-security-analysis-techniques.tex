@@ -52,7 +52,7 @@ The simplest way to do so would be to exhaustively test all possible inputs. Whi
 
 \subsubsection{Fuzzers Overview}
 
-To compensate for the exponential growth of the input space, fuzzers use various techniques to guide the input generation. For example, state-of-the-art, general-purpose fuzzer AFL++ \cite{AFLplusplus-Woot20} uses a technique called \textit{coverage-guided fuzzing} to generate inputs that are more likely to trigger bugs. This technique involves instrumenting the program to collect code coverage information and then using this information to guide the generation of inputs towards unexplored parts of the program.
+To compensate for the exponential growth of the input space, fuzzers use various techniques to guide the input generation. For example, state-of-the-art, general-purpose fuzzer AFL++ \cite{AFLplusplus-Woot20} uses a technique called \textit{coverage-guided fuzzing} to generate inputs that are more likely to trigger bugs. This technique involves instrumenting the program to collect code coverage information and then using this information to guide the generation of inputs toward unexplored parts of the program.
 
 Another example of input generation techniques used by fuzzers is \textit{grammar-based fuzzing}. This technique involves defining a grammar that describes the structure and syntax of valid inputs for a given program. The fuzzer then generates inputs that conform to this grammar, exploring different paths through the grammar to generate diverse inputs. This technique is used by various fuzzers, including Nautilus \cite{nautilus-grammar-fuzzer}, Superion \cite{superion-grammar-fuzzer}, Gramatron \cite{gramatron-effective-grammar-aware-fuzzing}, and others.
 
@@ -278,7 +278,7 @@ Another challenge arises from the fact that modern SMT solvers are not perfect a
 
 \newparagraph{Incomplete Symbolic Model}
 
-An additional obstacle of symbolic execution is the potential incompleteness of the symbolic model. It may not always be possible or practical to completely model a program symbolically, especially when dealing with interactions with the outside world, such as system calls. This can result in discrepancies between the symbolic program state and the real one, leading to unsolvable constraints that impede the effectiveness of the technique. However, some approaches, such as concolic testing, can help mitigate this challenge by combining symbolic and concrete execution.
+An additional obstacle to symbolic execution is the potential incompleteness of the symbolic model. It may not always be possible or practical to completely model a program symbolically, especially when dealing with interactions with the outside world, such as system calls. This can result in discrepancies between the symbolic program state and the real one, leading to unsolvable constraints that impede the effectiveness of the technique. However, some approaches, such as concolic testing, can help mitigate this challenge by combining symbolic and concrete execution.
 
 \newparagraph{Path Explosion}
 
@@ -324,13 +324,13 @@ In the paper \textit{SymQEMU: Compilation-based symbolic execution for binaries}
 
 At the same time, as SymQEMU paper was published, another paper \textit{FUZZOLIC: Mixing Fuzzing and Concolic Execution} \cite{fuzzolic-hybrid-fuzzer} was also published which proposed a hybrid fuzzer called Fuzzolic. Fuzzolic is built on top of the binary translator QEMU, offering significant benefits in terms of performance and versatility compared to the QSYM concolic executor. The authors also proposed an approximate solver called FUZZY-SAT \cite{fuzzy-sat-fuzzing-symbolic-expressions}, which borrows techniques from the fuzzing domain and provides an alternative to accurate but expensive SMT solving techniques.
 
-Besides the approximate solver, Fuzzolic is also the first to change the classic architecture of concolic engines. Instead of implementing a tracer and the solver as a single component, Fuzzolic decouples them into two separate components. This allows Fuzzolic to overcome one of the major problems affecting QSYM, which is the inability to use external libraries such as SMT solvers due to limitations of recent releases of most dynamic binary translation frameworks. By separating the tracer and solver components into distinct processes, Fuzzolic can avoid this issue and ensure compatibility with future changes in DBT frameworks.
+Besides the approximate solver, Fuzzolic is also the first to change the classic architecture of concolic engines. Instead of implementing a tracer and the solver as a single component, Fuzzolic decouples them into two separate components. This allows Fuzzolic to overcome one of the major problems affecting QSYM, which is the inability to use external libraries such as SMT solvers due to the limitations of recent releases of most dynamic binary translation frameworks. By separating the tracer and solver components into distinct processes, Fuzzolic can avoid this issue and ensure compatibility with future changes in DBT frameworks.
 
 Currently, Fuzzolic is one of the most advanced hybrid fuzzers in terms of performance and versatility. However, it is still in its early stages of development. Nevertheless, it is a promising approach that could potentially become the state-of-the-art solution for hybrid fuzzing.
 
 \newparagraph{Sydr} \label{hybrid-fuzzing:sydr}
 
-Lastly, Sydr \cite{sydr-cutting-edge-dynamic-symbolic-execution} is a binary-only dynamic symbolic execution (DSE) tool that employs dynamic binary instrumentation, like SymQEMU and Fuzzolic. However, unlike the SymQEMU or Fuzzolic it instruments the binary using DynamoRIO instead of QEMU. What is also notable is that Sydr separates the concrete executor (tracer) and the symbolic executor (solver) into two separate components, which is similar to Fuzzolic.
+Lastly, Sydr \cite{sydr-cutting-edge-dynamic-symbolic-execution} is a binary-only dynamic symbolic execution (DSE) tool that employs dynamic binary instrumentation, like SymQEMU and Fuzzolic. However, unlike the SymQEMU or Fuzzolic, it instruments the binary using DynamoRIO instead of QEMU. What is also notable is that Sydr separates the concrete executor (tracer) and the symbolic executor (solver) into two separate components, which is similar to Fuzzolic.
 
 Sydr employs a range of state-of-the-art techniques to enhance the performance of the symbolic execution engine, such as path predicate slicing, optimistic constraint solving, non-symbolic instruction skipping, and other methods.
 

@@ -176,7 +176,7 @@ With all the artifacts produced, we can now proceed to the next step - hybrid fu
 
 Before we can start the fuzzing, we need to prepare the environment. The preparation includes many steps, however, in our case, we only need to perform a single step - to generate the corpus for the fuzzer. The corpus is a set of inputs that are used by the fuzzer to generate new inputs.
 
-As most of our targets are aimed at fuzzing the unpickling functionality, we have collected the corpus by extracting test models from the PyTorch repository. Besides unpickling, we also had a few targets that were aimed at fuzzing the IR-parsing functionality. For these targets, we have searched for tests that use the \texttt{jit::parseIR} method and extracted the corresponding IRs. An example of such a testcase is shown in Listing \ref{listing:ir-program}.
+As most of our targets are aimed at fuzzing the unpickling functionality, we have collected the corpus by extracting test models from the PyTorch repository. Besides unpickling, we also had a few targets that were aimed at fuzzing the IR-parsing functionality. For these targets, we have searched for tests that use the \texttt{jit::parseIR} method and extracted the corresponding IRs. An example of such a test case is shown in Listing \ref{listing:ir-program}.
 
 \begin{listing}[h]
     \centering
@@ -253,7 +253,7 @@ Running the symbolic execution engine in the \textit{security} mode is a very ex
 
 Near the end, we have the crashes processing stage. During previous steps, \textit{sydr-fuzz} may have found some crashes. At this stage, those crashes need to be processed. To do so, \textit{sydr-fuzz} employs the \textit{casr} tool \cite{casr-cluster-ispras-2021}. This tool performs automatic crashes processing, which includes deduplication, and clusterization.
 
-Executing \textit{sydr-fuzz} in this mode, using the following command: \texttt{sydr-fuzz -c jit\_differential.toml casr}, will produce a set processed crashes.
+Executing \textit{sydr-fuzz} in this mode, using the following command: \texttt{sydr-fuzz -c jit\_differential.toml casr}, will produce a set of processed crashes.
 \newparagraph{Fuzz-Campaign Assessment}
 
 Finally, after all the steps are completed, we can assess the results of the fuzzing campaign. The assessment is performed manually by the user, and includes the following steps:
