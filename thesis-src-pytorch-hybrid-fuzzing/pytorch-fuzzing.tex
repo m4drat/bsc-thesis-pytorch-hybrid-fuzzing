@@ -109,7 +109,7 @@ Finally, we have compiled a list of the most interesting functions that are wort
     \label{table:fuzz-targets}
 \end{table}
 
-The first two functions are related to the JIT module and are responsible for parsing and loading the pickled data. Some examples of such data are: \texttt{saved models}, \texttt{serialized request}, and others.
+The first two functions are related to the JIT module and are responsible for parsing and loading the pickled data. Some examples of such data are: \texttt{saved models}, \texttt{serialized requests}, and others.
 
 The last two functions are related to the RPC module and are responsible for deserializing RPC requests and responses. These functions are interesting because they are directly processing untrusted data that is received from the network.
 
@@ -162,7 +162,7 @@ The first one is the fuzz target itself. It is the main entry point for the fuzz
 
 \newparagraph{Sydr Target}
 
-The second type of build target is the plain binary, which reads the data directly from the file and passes it to the fuzz target, without involving the fuzzer. It allows the symbolic execution engine to execute the fuzz target with concrete data. This target is also compiled with the help \textit{clang} compiler, however, the flags are different: \texttt{-fPIC -g}. We have also added the \texttt{\_sydr} suffix to the name of the binary.
+The second type of build target is the plain binary, which reads the data directly from the file and passes it to the fuzz target, without involving the fuzzer. It allows the symbolic execution engine to execute the fuzz target with concrete data. This target is also compiled with the help of the \textit{clang} compiler, however, the flags are different: \texttt{-fPIC -g}. We have also added the \texttt{\_sydr} suffix to the name of the binary.
 
 \newparagraph{Coverage Target}
 
