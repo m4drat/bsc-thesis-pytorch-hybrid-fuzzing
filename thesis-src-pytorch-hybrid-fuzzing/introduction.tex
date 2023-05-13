@@ -1,12 +1,10 @@
 \section{Introduction}
 
-Software security is a growing concern in the modern world. With the rapid development of information technologies, the number and complexity of software systems have increased drastically. This has led to an increase in the number of software vulnerabilities as well as an increasing need for secure software development practices.
-
-\subsection{Memory Safety Vulnerabilities}
+Software security is a growing concern in the modern world. With the rapid development of information technologies, the number and complexity of software systems have increased drastically. This has led to an increase in the number of software vulnerabilities as well as a growing need for secure software development practices.
 
 Memory safety vulnerabilities are a particularly significant concern in software security. They refer to programming errors that can cause a program to access memory in unintended ways, potentially leading to system crashes, data leaks, or even full system compromise. Memory safety vulnerabilities are especially prevalent in large codebases written in memory-unsafe languages such as C and C++.
 
-According to \cite{what-science-can-tell-us-about-c-and-c++-security}, for codebases with more than one million lines of code, at least 65\% of security vulnerabilities are caused by memory safety issues in C and C++. The Chromium project security team also highlights the same point in their report \cite{chromium-project-memory-safety}. This alarming statistic underscores the importance of addressing memory safety vulnerabilities in software development. Especially, for critical software systems, such as operating systems, web browsers, machine learning frameworks, and beyond.
+According to \cite{what-science-can-tell-us-about-c-and-c++-security}, for codebases with more than one million lines of code, at least 65\% of security vulnerabilities are caused by memory safety issues in C and C++. The Chromium project security team also highlights the same point in their report \cite{chromium-project-memory-safety}. This alarming statistic emphasizes the importance of addressing memory safety vulnerabilities in software development. This especially applies to critical software systems, such as operating systems, web browsers, machine learning frameworks, etc.
 
 \subsection{AI and Security}
 
@@ -14,7 +12,7 @@ According to \cite{what-science-can-tell-us-about-c-and-c++-security}, for codeb
 
 In recent years, AI (Artificial Intelligence) has emerged as a key technology in many domains, including banking, healthcare, transportation, and more. With the rise of AI-powered applications, there is an increasing need for secure AI models and software systems that can withstand cyber threats, as these systems are often used to make critical decisions that affect human lives.
 
-Of particular interest is the security of AI frameworks. Often, these systems are the foundation of AI applications. As such, vulnerabilities in AI frameworks can have a significant impact on the security of applications built on top of them.
+Of particular interest is the security of frameworks that are used to develop AI systems. Often, these systems are the foundation of AI applications. As such, vulnerabilities in AI frameworks can have a significant impact on the security of applications built on top of them.
 
 One of the most popular AI frameworks is PyTorch \cite{pytorch}. PyTorch is an open-source machine learning framework developed by Meta (formerly Facebook). It is used by many companies and organizations, including Microsoft, Uber, Twitter, and more. Despite its popularity, PyTorch is not immune to security vulnerabilities, especially given that it is written in C++, a memory-unsafe language.
 
@@ -22,4 +20,4 @@ Considering the importance of PyTorch in the AI ecosystem, it is crucial to ensu
 
 \subsection{Objective}
 
-Our objective in this work is twofold: to perform a comprehensive security analysis of PyTorch using hybrid fuzzing techniques with the goal of detecting and addressing any memory safety vulnerabilities present in the framework, and to enhance sydr-fuzz \cite{sydr-cutting-edge-dynamic-symbolic-execution} - a hybrid fuzzing tool developed by ISP RAS.
+The objective of this work is to perform a comprehensive security analysis of the PyTorch framework using hybrid fuzzing techniques in order to detect and address any memory safety issues. This work is also aimed at enhancing sydr-fuzz \cite{sydr-cutting-edge-dynamic-symbolic-execution} - a hybrid fuzzing tool developed by ISP RAS, which I used to perform the analysis.

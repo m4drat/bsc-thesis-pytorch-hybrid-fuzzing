@@ -6,13 +6,13 @@ PyTorch is a critical component of many applications across various industries s
 
 Despite its popularity and usefulness, PyTorch has several challenges that must be addressed to ensure its reliability and security. PyTorch has multiple dependencies, and it includes a considerable amount of C/C++ code which implies that it is susceptible to memory safety vulnerabilities. Moreover, PyTorch is an interesting target for adversaries since it is used in critical applications. Therefore, it is crucial to ensure that PyTorch is secure and free from vulnerabilities. Fuzzing is a valuable technique that can help identify bugs and vulnerabilities in PyTorch, making it more robust and secure. By fuzzing PyTorch, we can ensure that it can withstand attacks and continue to operate correctly in real-world applications.
 
-In this chapter, we will explore the concept of PyTorch fuzzing and its significance in improving the reliability and security of PyTorch. We will begin by describing its attack surface. We will then develop fuzzing harnesses for the interesting parts of the codebase. Finally, we will describe the fuzzing methodology and the results of our work.
+This chapter delves into the concept of PyTorch fuzzing and its importance in enhancing the reliability and security of PyTorch. The exploration commences with an examination of its attack surface. Subsequently, fuzzing harnesses will be developed for the relevant sections of the codebase. The fuzzing methodology and the outcomes of the work will be outlined as well.
 
 \subsection{Attack Surface Mapping}
 
-To begin our fuzzing efforts, we must first identify the attack surface of PyTorch. The attack surface refers to all the entry points through which an attacker can potentially interact with the system and launch an attack. In the case of PyTorch, its attack surface includes various modules, libraries, and dependencies that it uses.
+To initiate the fuzzing process, it is essential to determine the attack surface of PyTorch. The attack surface refers to all the entry points through which an attacker can potentially interact with the system and launch an attack. In the case of PyTorch, its attack surface includes various modules, libraries, and dependencies that it uses.
 
-To identify interesting parts of the codebase that are relevant to the attack surface, we have performed manual code analysis. Our analysis has highlighted several modules that are particularly interesting to fuzz, including the model loading and RPC communications modules.
+To identify interesting parts of the codebase that are relevant to the attack surface, a manual code analysis was conducted. This analysis has highlighted several modules that are particularly interesting to analyze, including the model loading and RPC communications modules.
 
 \subsubsection{Model Loading}
 
@@ -42,7 +42,7 @@ PyTorch uses various types of RPCs such as \texttt{RRef} (Remote Reference),\\ \
 
 Unfortunately, the complexity of this system makes it prone to bugs and vulnerabilities. Multiple serializations and deserializations of messages can introduce bugs, and the fact that the RPC protocol is implemented in C++ makes it an attractive target to look for memory safety vulnerabilities. Moreover, given the memory-unsafe nature of the RPC protocol, a single bug could potentially allow an attacker to execute code remotely on a target machine. As a result, fuzzing the RPC module is highly recommended to identify and address potential vulnerabilities.
 
-With that in mind, we have identified the following files as the most interesting targets for security research:
+Taking that into consideration, the following files have been identified as the most interesting targets for security research.
 
 \begingroup
 \begin{itemize}
@@ -53,27 +53,27 @@ With that in mind, we have identified the following files as the most interestin
 
 \subsubsection{Finding Fuzz-Targets}
 
-Now that we have identified different parts of the PyTorch codebase that are relevant to the attack surface, we can proceed to the second part of the attack surface mapping - identifying specific functions and methods to fuzz.
+Having identified various sections of the PyTorch codebase that are relevant to the attack surface, we can proceed to the second part of the attack surface mapping - identifying specific functions and methods to fuzz.
 
-To achieve this, we have used two different approaches:
+To achieve this, two different approaches have been used:
 
 \begin{enumerate}
-    \item \textbf{Manual code review} - we have performed a manual code review of the PyTorch codebase to identify relevant functions that are confined to the defined attack surface.
-    \item \textbf{CodeQL} - we have used CodeQL \cite{ql-object-oriented-queries-on-relational-data} to broadly search for interesting functions and methods that perform some kind of deserialization or parsing.
+    \item \textbf{Manual code review} - A manual code review of the PyTorch codebase has been performed to identify relevant functions that are confined to the defined attack surface.
+    \item \textbf{CodeQL} - A CodeQL \cite{ql-object-oriented-queries-on-relational-data} has been utilized to broadly search for interesting functions and methods that perform some kind of deserialization or parsing.
 \end{enumerate}
 
-The first approach is straightforward and does not require any additional tools. However, it is time-consuming and requires a lot of manual work. Nevertheless, it yields the best results since it allows us to precisely identify the functions that might be interesting to fuzz.
+The first approach is straightforward and does not require any additional tools. However, it is time-consuming and requires a lot of manual work. Nevertheless, it yields the best results since it allows a researcher to precisely identify the functions that might be interesting to fuzz.
 
-The second approach lacks "precision" but can be automated and scaled to a large codebase. It allows us to quickly identify a narrowed-down set of functions that are worth looking into. However, it is not as precise as the first approach since it relies on heuristics and does not "understand" the code. As a result, it can miss some relevant functions. Nevertheless, it is a good starting point for fuzzing since it can help identify interesting functions that can be further analyzed manually.
+The second approach lacks "precision" but can be automated and scaled to a large codebase. It allows for quick identification of a narrowed-down set of functions that are worth looking into. However, it is not as precise as the first approach since it relies on heuristics and does not "understand" the code. As a result, it can miss some relevant functions. Nevertheless, it is a good starting point for fuzzing since it can help identify interesting functions that can be further analyzed manually.
 
-To begin with, we employed the second approach to pinpoint some specific functions that are worth looking into. We developed a CodeQL query \ref{appendix:codeql-query} that searches for functions that have two parameters:
+To begin with, the second approach was employed to pinpoint some specific functions that are worth looking into. A CodeQL query \ref{appendix:codeql-query} was developed to search for functions that have two parameters:
 
 \begin{enumerate}
     \item The first parameter is a pointer to data of "parsable" types. For example - \texttt{char*}, \texttt{byte*}, and others.
     \item The second parameter is an integer that represents the size of the data. For example - \texttt{int}, \texttt{size\_t}, and others.
 \end{enumerate}
 
-With that in place, we added a few more heuristics to filter out irrelevant functions. Finally, we used \textit{Cyclomatic Complexity} \cite{cyclomatic-complexity-density} to rank the results and identify the most complex functions. Some results of the query are shown in Table \ref{table:codeql-results}.
+With that in place, a few more heuristics were added to filter out irrelevant functions. Finally, \textit{Cyclomatic Complexity} \cite{cyclomatic-complexity-density} was used to rank the results and identify the most complex functions. Some results of the query are shown in Table \ref{table:codeql-results}.
 
 \begin{table}[h]
     \centering
@@ -90,9 +90,9 @@ With that in place, we added a few more heuristics to filter out irrelevant func
     \label{table:codeql-results}
 \end{table}
 
-These results gave us a good starting point. From here, we manually reviewed the functions and started to study the codebase, employing the first approach.
+These findings served as a solid starting point. From here, the functions were manually reviewed, and the codebase was thoroughly studied, employing the first approach.
 
-Finally, we have compiled a list of the most interesting functions that are worth fuzzing. The list is shown in Table \ref{table:fuzz-targets}.
+Finally, a list of the most interesting functions that are worth fuzzing has been compiled. The list is shown in Table \ref{table:fuzz-targets}.
 
 \begin{table}[h]
     \centering
@@ -113,12 +113,11 @@ The first two functions are related to the JIT module and are responsible for pa
 
 The last two functions are related to the RPC module and are responsible for deserializing RPC requests and responses. These functions are interesting because they are directly processing untrusted data that is received from the network.
 
-Besides that, we have also identified another interesting function - \\ \texttt{jit::preoptimizeGraph}, which is a part of the JIT module. We decided to target it with differential fuzzing to find bugs related to the optimization of the JIT graphs.
+Besides that, another interesting function - \\ \texttt{jit::preoptimizeGraph}, has been identified within the JIT module. It has been chosen as a target for differential fuzzing, with the objective of uncovering bugs associated with JIT graph optimizations.
 
 \subsection{Preparing PyTorch for Fuzzing}
-\subsubsection{Fuzzing Harness Development}
 
-With the fuzz targets identified, we can proceed to the next step - developing a fuzzing harness. The goal of the fuzzing harness is to provide a way to feed the fuzz target with data and collect the results of the execution. For our purposes, we have developed a \textit{LibFuzzer}-compatible \cite{libfuzzer-secdev-2016} targets for each of the functions listed in Table \ref{table:fuzz-targets}.
+Having identified the fuzz targets, the subsequent step involves the development of a fuzzing harness. The goal of the fuzzing harness is to provide a way to feed the fuzz target with data and collect the results of the execution. In alignment with the chosen objective, \textit{LibFuzzer}-compatible \cite{libfuzzer-secdev-2016} targets have been created for each of the functions enumerated in Table \ref{table:fuzz-targets}.
 
 Each libFuzzer-based target shares the same structure. The structure is shown in Listing \ref{listing:fuzz-target-structure}.
 
@@ -127,7 +126,7 @@ Each libFuzzer-based target shares the same structure. The structure is shown in
     \begin{minipage}{.9\linewidth}
         \begin{minted}[linenos=true, tabsize=4]{cpp}
 int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
-    // 1. Parse the input data
+    // 1. Prepare the input data
     // 2. Call the fuzz target with the parsed data
     // 3. Return 0
 }
@@ -139,7 +138,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
 The goal of a generic fuzzing harness is to pass the data generated by the fuzzer to the fuzz target and clean up the resources after the execution is finished. The fuzzing harness is also responsible for handling the exceptions that might be thrown by the fuzz target.
 
-The fuzzing harnesses that we have developed for PyTorch are similar to the generic one. However, they also perform some additional steps. For example, they handle some PyTorch-specific exceptions.
+The fuzzing harnesses that have been developed for PyTorch are similar to the generic one. However, they also perform some additional steps. For example, they handle some PyTorch-specific exceptions.
 
 The developed fuzzing harnesses are listed below:
 
@@ -150,33 +149,31 @@ The developed fuzzing harnesses are listed below:
     \item \href{https://github.com/ispras/oss-sydr-fuzz/blob/028e36875424aec00ef7375006c413a4be164197/projects/pytorch/jit_differential_fuzz.cc}{\texttt{jit\_differential\_fuzz.cc}} - fuzzes three related methods - \texttt{jit::parseIR}, \texttt{jit::preoptimizeGraph}, and \texttt{jit::InterpreterState(code).run()} with differential fuzzing
 \end{itemize}
 
-However, the development of fuzzing harnesses is only one more step on the road toward hybrid fuzzing. The next step is to compile all the necessary build targets and prepare the environment.
-
-\subsubsection{Build Targets Compilation}
-
-To meet the requirements of hybrid fuzzing, we need to prepare a few different types of build targets.
+However, the development of fuzzing harnesses is only one more step on the road toward hybrid fuzzing. The next step is to compile all the necessary build targets.
 
 \newparagraph{LibFuzzer Target}
 
-The first one is the fuzz target itself. It is the main entry point for the fuzzer. This target is compiled using the \textit{clang} compiler with the \textit{libFuzzer} library linked. To achieve this, we have added the following compilation flags to the build script: \texttt{-fPIC -g -fsanitize=fuzzer,address,bounds}. To easily distinguish the fuzz target from other targets, we have also added the \texttt{\_fuzz} suffix to the name of the produced binary.
+The first one is the fuzz target itself. It is the main entry point for the fuzzer. This target is compiled using the \textit{clang} compiler with the \textit{libFuzzer} library linked, as well as the \textit{libasan} library. The latter is known as the \textit{AddressSanitizer} \cite{address-sanitizer-usenix-2012} and is required to maximize the chances of finding memory-related bugs.
+
+To build this target, the following compilation flags were added to the build script: \texttt{-fPIC -g -fsanitize=fuzzer,address,bounds}. To easily distinguish the produced binary from other targets, a \texttt{\_fuzz} suffix was added to its name.
 
 \newparagraph{Sydr Target}
 
-The second type of build target is the plain binary, which reads the data directly from the file and passes it to the fuzz target, without involving the fuzzer. It allows the symbolic execution engine to execute the fuzz target with concrete data. This target is also compiled with the help of the \textit{clang} compiler, however, the flags are different: \texttt{-fPIC -g}. We have also added the \texttt{\_sydr} suffix to the name of the binary.
+The second type of build target is the plain binary for symbolic execution, which reads the data directly from the file and passes it to the fuzz target, without involving the fuzzer. It allows the symbolic execution engine to execute the fuzz target with concrete data. This target is also compiled with the help of the \textit{clang} compiler, however, the flags are different: \texttt{-fPIC -g}. Moreover, this time sanitizers are not used, as they would only complicate the symbolic execution process. A \texttt{\_sydr} suffix was also added to the name of the binary.
 
 \newparagraph{Coverage Target}
 
-And the last type of build target is the binary that is used to collect the coverage information. It is compiled with the \textit{clang} compiler and the following flags: \texttt{-fPIC -g -fprofile-instr-generate -fcoverage-mapping}. As for the previous targets, we have also added the \texttt{\_cov} suffix to the name of the binary.
+And the last type of build target is the binary that is used to collect the coverage information. It is compiled with the \textit{clang} compiler and the following flags: \texttt{-fPIC -g -fprofile-instr-generate -fcoverage-mapping}. As for the previous targets, the \texttt{\_cov} suffix has been incorporated into the binary's name.
 
 \subsection{PyTorch Hybrid Fuzzing}
 
-With all the artifacts produced, we can now proceed to the next step - hybrid fuzzing. The goal of this step is to prepare the environment, perform the fuzzing, and analyze the results. To perform hybrid fuzzing, we have used the \textit{sydr-fuzz}, a tool developed by ISP RAS. \textit{Sydr-fuzz} is a flexible framework for hybrid fuzzing, which allows us to easily perform the fuzzing of the target program with the help of the symbolic execution engine and state-of-the-art fuzzers such as \textit{AFL++} and \textit{libFuzzer}.
+With all the artifacts produced, we can now proceed to the next step - hybrid fuzzing. The goal of this step is to prepare the corpus, perform the fuzzing, and analyze the results. To carry out hybrid fuzzing, the \textit{sydr-fuzz} tool, developed by ISP RAS, has been employed. The \textit{sydr-fuzz} framework is a versatile tool for hybrid fuzzing, enabling the seamless integration of symbolic execution engines and state-of-the-art fuzzers like \textit{AFL++} and \textit{libFuzzer} for efficient fuzzing of the target program.
 
-\subsubsection{Preparing the Environment}
+\subsubsection{Preparing the Corpus}
 
-Before we can start the fuzzing, we need to prepare the environment. The preparation includes many steps, however, in our case, we only need to perform a single step - to generate the corpus for the fuzzer. The corpus is a set of inputs that are used by the fuzzer to generate new inputs.
+Prior to commencing the fuzzing, it is necessary to prepare the corpus for the fuzzer. The corpus represents a collection of inputs that the fuzzer utilizes to generate new inputs.
 
-As most of our targets are aimed at fuzzing the unpickling functionality, we have collected the corpus by extracting test models from the PyTorch repository. Besides unpickling, we also had a few targets that were aimed at fuzzing the IR-parsing functionality. For these targets, we have searched for tests that use the \texttt{jit::parseIR} method and extracted the corresponding IRs. An example of such a test case is shown in Listing \ref{listing:ir-program}.
+As most of the targets were aimed at fuzzing the unpickling functionality, the corpus was gathered by extracting test models from the PyTorch repository. Besides unpickling, a few targets were aimed at fuzzing the IR-parsing functionality. For these targets, tests that use the \texttt{jit::parseIR} method were found and the corresponding intermediate representations (IRs) were extracted. An example of such a test case is shown in Listing \ref{listing:ir-program}.
 
 \begin{listing}[h]
     \centering
@@ -200,7 +197,9 @@ graph(%a : Tensor):
 
 \subsubsection{Dynamic Analysis Pipeline}
 
-With everything prepared, we can now proceed to the fuzzing itself. The fuzzing is performed in a form of a dynamic analysis pipeline, which is illustrated in Diagram \ref{fig:dynamic-analysis-pipeline}.
+With all the necessary preparations completed, the actual fuzzing process can now be initiated. Fuzzing is carried out through a continuous dynamic analysis pipeline, as depicted in Diagram \ref{fig:dynamic-analysis-pipeline}. This pipeline operates continuously, reflecting the iterative nature of bug-fixing and testing. Whenever a new version of the program is released or a patch is proposed, the pipeline is triggered.
+
+The pipeline consists of the following steps:
 
 \begin{figure}[h]
     \centering
@@ -235,11 +234,11 @@ target = "/jit_differential_cov @@"
 
 This configuration file contains three sections: \texttt{sydr}, \texttt{libfuzzer}, and \texttt{cov}. The \texttt{sydr} section contains information about the target program and how to execute it under the symbolic execution engine. The \texttt{libfuzzer} section contains libfuzzer-related information, such as the path to the fuzz target binary and the arguments that should be passed to it. Finally, the \texttt{cov} section contains information about the coverage target.
 
-With the configuration file prepared, we can now start the fuzzing campaign. To do so, we need to execute the \textit{sydr-fuzz} binary as follows: \texttt{sydr-fuzz -c jit\_differential.toml run}. The command will start the fuzzing process and will print the results to the console.
+With the configuration file prepared, the fuzzing campaign can be started. To do so, the \textit{sydr-fuzz} binary needs to be executed as follows: \texttt{sydr-fuzz -c jit\_differential.toml run}. The command will start the fuzzing process and will print the results to the console.
 
 \newparagraph{Corpus Minimization}
 
-After running the fuzzer for some time, we can proceed to the next step of the pipeline - corpus minimization. The goal of this step is to reduce the size of the corpus by removing the redundant inputs. The corpus minimization is performed using the \textit{sydr-fuzz} tool in the \textit{cmin} mode.
+After running the fuzzer for some time, the subsequent step in the pipeline involves corpus minimization. The goal of this step is to reduce the size of the corpus by removing the redundant inputs. The corpus minimization is performed using the \textit{sydr-fuzz} tool in the \textit{cmin} mode. Under the hood, \textit{sydr-fuzz} uses either \textit{afl-cmin} or the \textit{libfuzzer -merge=1} utilities.
 
 This step is optional, however, it is highly recommended, because it greatly improves the performance of the next step - security invariants verification. Without corpus minimization, the security invariants verification is less likely to find any bugs, as it will potentially re-execute almost the same inputs multiple times.
 
@@ -247,16 +246,16 @@ This step is optional, however, it is highly recommended, because it greatly imp
 
 The next step of the pipeline is security invariants verification. The idea behind this step is to execute the \textit{sydr} symbolic execution engine in the \textit{security} mode, with inputs from the minimized corpus. The \textit{security} mode is a special mode that is designed to check for violation of various security invariants, such as integer overflows, null pointer dereferences, buffer overflows, and others. If any of the invariants are violated, the symbolic execution engine will report the corresponding bug.
 
-Running the symbolic execution engine in the \textit{security} mode is a very expensive operation. For this reason, we have worked on the optimization of this step. The results are discussed in chapter \ref{hybrid-fuzzer-improvements:optimizing-security-predicates}.
+Running the symbolic execution engine in the \textit{security} mode is a very expensive operation. For this reason, efforts have been directed toward optimizing its performance. The results are discussed in chapter \ref{hybrid-fuzzer-improvements:optimizing-security-predicates}.
 
 \newparagraph{Crashes Processing}
 
-Near the end, we have the crashes processing stage. During previous steps, \textit{sydr-fuzz} may have found some crashes. At this stage, those crashes need to be processed. To do so, \textit{sydr-fuzz} employs the \textit{casr} tool \cite{casr-cluster-ispras-2021}. This tool performs automatic crashes processing, which includes deduplication, and clusterization.
+Near the end, the crashes processing is performed. During previous steps, \textit{sydr-fuzz} may have found some crashes. At this stage, those crashes need to be deduplicated and preprocessed. To do so, \textit{sydr-fuzz} employs the \textit{casr} tool \cite{casr-cluster-ispras-2021}. This tool performs automatic crashes processing, which includes deduplication, and clusterization.
 
 Executing \textit{sydr-fuzz} in this mode, using the following command: \texttt{sydr-fuzz -c jit\_differential.toml casr}, will produce a set of processed crashes.
 \newparagraph{Fuzz-Campaign Assessment}
 
-Finally, after all the steps are completed, we can assess the results of the fuzzing campaign. The assessment is performed manually by the user, and includes the following steps:
+Finally, after all the steps are completed, the results of the fuzzing campaign are assessed. The assessment is performed manually by the user, and includes the following steps:
 
 \begin{enumerate}
     \item Bug triaging and reporting
@@ -267,13 +266,13 @@ During the bug triaging and reporting step, the user needs to analyze the found 
 
 The code coverage analysis step is performed to assess the effectiveness of the fuzzing campaign. The goal of this step is to help the user to understand whether the fuzzing campaign was effective and whether it is worth continuing it. The code coverage analysis is performed using the \textit{sydr-fuzz} tool in the \textit{cov} mode.
 
-This concludes the description of the dynamic analysis pipeline, which has been used to fuzz the PyTorch framework. In the next section, we will discuss some of the findings.
+This concludes the description of the dynamic analysis pipeline, which has been used to fuzz the PyTorch framework. In the next section, some of the findings will be discussed.
 
 \subsection{Results Overview}
 
-As a result of our work multiple bugs were found in different parts of the PyTorch framework. Most of the bugs were found in the module responsible for unpickling, however, we have also identified at least one remotely-accessible bug in the RPC module.
+As a result of this work, multiple bugs were found in different parts of the PyTorch framework. The majority of the bugs were discovered within the module responsible for unpickling. Nevertheless, it is worth noting that at least one remotely-accessible bug was identified in the RPC module.
 
-We reported all discovered bugs to the PyTorch framework developers, who confirmed their validity and subsequently merged the corresponding pull requests into the PyTorch repository. The pull requests related to the bugs are listed below:
+All discovered bugs were reported to the PyTorch framework developers, who confirmed their validity and subsequently merged the corresponding pull requests into the PyTorch repository. The pull requests related to the bugs are listed below:
 
 \begin{itemize}
     \item \href{https://github.com/pytorch/pytorch/pull/94300}{\#94300: Add size check before calling stack\_.at(dict\_pos) in unpickler.cpp}
@@ -283,4 +282,4 @@ We reported all discovered bugs to the PyTorch framework developers, who confirm
     \item \href{https://github.com/pytorch/pytorch/pull/91401}{\#91401: Add out-of-bounds checks inside irparser.cpp and unpickler.cpp}
 \end{itemize}
 
-In section \ref{results:pytorch-findings}, we will take a closer look at the bugs we found and the pull requests we created.
+In section \ref{results:pytorch-findings}, a closer inspection of the bugs found, and the pull created will be performed.

@@ -1,6 +1,6 @@
 \section{Software Security Analysis Techniques}
 
-As we have seen in the previous section, software security is a question of paramount importance in the modern world. Due to the increasing complexity of software systems, it is no longer feasible to rely only on manual code reviews and testing to ensure that they are secure. Instead, a variety of automated analysis techniques have been developed to help developers detect and address security vulnerabilities in their software.
+As we have seen in the previous section, software security is a question of paramount importance in the modern world. Due to the increasing complexity of software systems, it is no longer feasible to rely only on manual code reviews and testing to ensure that they are secure. Instead, a variety of automated analysis techniques have been developed to help software engineers to detect and address security vulnerabilities in their software.
 
 The security analysis techniques can be broadly divided into two categories:
 
@@ -9,19 +9,15 @@ The security analysis techniques can be broadly divided into two categories:
 	\item Dynamic Analysis
 \end{itemize}
 
-In this section, we will provide an overview of static analysis and then delve into a detailed examination of dynamic analysis techniques.
-
-\subsection{Static Analysis}
-
 A set of techniques known as static analysis involves analyzing the source code of a program without executing it. This approach allows us to detect a wide range of problems in the code, potentially examining all possible execution paths.
 
-Although static analysis tends to be more exhaustive, it suffers a lot from false positives as well as false negatives. Furthermore, static analysis tends to be very slow and resource-intensive, especially for large codebases.
+Although static analysis tends to be more exhaustive, it suffers a lot from false positives as well as false negatives, which implies that the results need to be manually verified. Furthermore, static analysis does not generate test cases that can be used to reproduce the detected issues.
 
 To mitigate these concerns, dynamic analysis is frequently employed in conjunction with static analysis. Although it may not be as comprehensive as static analysis, it allows identifying issues that static analysis may miss.
 
 \subsection{Dynamic Analysis}
 
-Dynamic analysis, also known as fuzzing is one of the most popular techniques for finding bugs and vulnerabilities in software. It involves running a program with various inputs and monitoring its behavior. The goal of fuzzing is to detect error conditions in the program by observing its behavior under different inputs.
+One of the most popular dynamic analysis techniques for finding bugs and vulnerabilities in software is fuzzing. It involves running a program with various inputs and monitoring its behavior. The goal of fuzzing is to detect error conditions in the program by observing its behavior under different inputs.
 
 Consider example \ref{lst:example1}. This program takes a string as input and checks if the first four characters are equal to "\textbf{FUZZ}". If they are, the program crashes. Otherwise, it does nothing.
 
@@ -72,8 +68,6 @@ Omitting some details, the fuzzing process can be summarized as follows:
 	\item Continue fuzzing until a stopping condition is met (e.g. a timeout)
 \end{enumerate}
 
-To implement the fuzzing process described above, a fuzzing loop can be used as shown in Algorithm \ref{alg:fuzzing-loop}.
-
 \begin{figure}[ht]
 	\centering
 	\begin{minipage}{.7\linewidth}
@@ -105,7 +99,7 @@ The natural modularity of the fuzzing process has proven to be beneficial, as sh
 
 To further understand the different techniques used by fuzzers, let us take a look at some papers that focus on individual components of the fuzzing process.
 
-One important component is the mutation engine used to generate new inputs from existing ones. In the paper \cite{redqueen-ndss19}, the authors propose a new mutation strategy called Redqueen, which utilizes feedback from previous executions to build input-to-state correspondence. This allows Redqueen to solve simple comparison-based constraints, such as the one in the Listing \ref{lst:example2}, assuming the input-to-state mapping is one-to-one.
+One important component is the mutation engine used to generate new inputs from existing ones. In the paper \cite{redqueen-ndss19}, the authors propose a new mutation strategy called Redqueen, which utilizes feedback from previous executions to build input-to-state correspondence. This allows Redqueen to analyze some comparison-based expressions, such as the one in the Listing \ref{lst:example2}. As a result, Redqueen is able to invert the condition in one step, assuming the input-to-state mapping is one-to-one. This, in turn, allows for a much faster path exploration, as the fuzzer does not have to guess the correct input value.
 
 \begin{listing}[htp]
 	\centering
@@ -120,11 +114,11 @@ if (strcmp(buf, "FuZzing1sC00L") == 0) {
 	\label{lst:example2}
 \end{listing}
 
-Another important component is the input selection strategy. In the paper \cite{effective-seed-scheduling-for-fuzzing-with-graph-centrality-analysis}, the authors propose a new seed selection strategy called \textit{K-Scheduler}, which uses graph centrality analysis to select seeds that are more likely to increase feature coverage. The authors show that this strategy outperforms other seed selection strategies, such as \textit{Entropic}, or next-best AFL-based seed scheduler \textit{RarePath} by 25.89\% and 4.21\%, respectively.
+Another important component is the input selection strategy. In the paper \cite{effective-seed-scheduling-for-fuzzing-with-graph-centrality-analysis}, the authors propose a new seed selection strategy called \textit{K-Scheduler}, which uses control-flow graph centrality analysis to select seeds that are more likely to increase feature coverage. The authors show that this strategy outperforms other seed selection strategies, such as \textit{Entropic}, or next-best AFL-based seed scheduler \textit{RarePath} by 25.89\% and 4.21\%, respectively.
 
 \subsubsection{Challenges} \label{fuzzing:challenges}
 
-In conclusion, fuzzing has become one of the best techniques to find bugs in software. Through extensive research, various techniques have been developed and applied to different components of the fuzzing process, such as mutation engines, input selection strategies, and others. However, many challenges have not been solved yet. Ranging from the scalability of fuzzing to the quality of the generated inputs, many areas can be improved.
+In conclusion, fuzzing has become one of the best techniques \cite{fuzzing-a-survey-2018} to find bugs in software. Through extensive research, various techniques have been developed and applied to different components of the fuzzing process, such as mutation engines, input selection strategies, and others. However, many challenges have not been solved yet. Ranging from the scalability of fuzzing to the quality of the generated inputs, many areas can be improved.
 
 One particularly challenging problem is the generation of inputs that satisfy complex constraints. Even with the most advanced fuzzers, it is still difficult, if not impossible, to generate inputs that satisfy constraints such as the one in Listing \ref{lst:example3}. This happens because the constraints may involve complex arithmetic operations or other hard-to-resolve dependencies between input values. As a result, traditional fuzzing techniques that rely on random or mutation-based input generation with coverage feedback are not sufficient to solve this problem.
 
@@ -147,11 +141,11 @@ That is where another set of techniques called \textit{Symbolic Interpretation} 
 
 \subsection{Symbolic Interpretation}
 
-Symbolic interpretation, also known as symbolic execution, aims to solve the problem of generating inputs that satisfy complex constraints, such as the one in Listing \ref{lst:example3}.
+Symbolic interpretation, also known as symbolic execution, is another dynamic analysis technique that performs path exploration and bug detection by analyzing a mathematical representation of the program state. It can be used to solve the problem of generating inputs that satisfy complex constraints, such as the one in Listing \ref{lst:example3}.
 
-Essentially, symbolic execution is a powerful technique that enables us to run a program with symbolic inputs instead of concrete ones. By treating program states as sets of constraints on these inputs, we can systematically explore different paths through the code and generate new test cases that can reveal hidden bugs.
+Essentially, symbolic execution is a powerful technique that runs the program with symbolic inputs instead of concrete ones. By treating program states as sets of constraints on these inputs, we can systematically explore different paths through the code and generate new test cases that can reveal hidden bugs.
 
-For example, the state of the program in Listing \ref{lst:example3} can be defined by this equation: \mintinline{python}{key * 0xa9a57b = 0x1337beef}. Depending on whether this equation is satisfied or not, we either take the \texttt{true} or the \texttt{false} branch. By solving this equation, we can generate an input that would open up the \texttt{true} branch, and thus trigger the \texttt{error()} function. For this particular example, the input \mintinline{python}{0x1337beef / 0xa9a57b = 0x1d} would satisfy the equation and trigger the error. What is notable, for classical fuzzers, it would require exhaustively testing all possible inputs to find this one, as there is no feedback that would guide the fuzzer toward this input.
+For example, the state of the program in Listing \ref{lst:example3} can be defined by this equation: \mintinline{python}{key * 0xa9a57b = 0x1337beef}. Depending on whether this equation is satisfied or not, we either take the \texttt{true} or the \texttt{false} branch. By solving this equation, we can generate an input that would open up the \texttt{true} branch, and thus trigger the \texttt{error()} function. For this particular example, the input \mintinline{python}{0x1337beef / 0xa9a57b = 0x1d} would satisfy the equation and trigger the error. What is notable, for classic fuzzers, it would require exhaustively testing all possible inputs to find this one, as there is no feedback that would guide the fuzzer toward this input.
 
 Now that we have covered the fundamentals of symbolic execution, let us delve deeper into the various components of the symbolic execution process.
 
@@ -159,7 +153,7 @@ Now that we have covered the fundamentals of symbolic execution, let us delve de
 
 Symbolic representation is the initial stage of the symbolic execution process where program variables and inputs are represented as symbolic expressions that can be mathematically evaluated and manipulated.
 
-To effectively build and update a program's symbolic state based on the instruction semantics, it is necessary to symbolically execute machine code instructions while simultaneously updating the symbolic state. A convenient approach is to use a dynamic binary analysis framework, such as Triton \cite{triton-sstic2015}, which provides an API for symbolic execution and allows us to easily build symbolic expressions from machine code instructions.
+To effectively build and update a program's symbolic state based on the instruction semantics, it is necessary to symbolically execute machine code instructions while simultaneously updating the symbolic state. To do this, a dynamic binary analysis framework may be used. For example, Triton \cite{triton-sstic2015} is an open-source framework that provides an API for symbolic execution and allows us to easily build symbolic expressions from machine code instructions.
 
 In Listing \ref{lst:example4}, we can see an example of how Triton can be used to symbolically execute a program from Listing \ref{lst:example3}, and generate an equation for the conditional jump instruction.
 
@@ -196,25 +190,23 @@ Triton provides a powerful mechanism for interpreting machine code instructions 
 
 This approach is commonly used by various symbolic execution engines, such as QSym \cite{qsym-usenix2018} and others. In the case of QSym, the symbolic execution engine simply concretizes the instructions that cannot be symbolically executed and then continues with the symbolic execution. This approach is called \textit{concolic execution} and is widely used in symbolic execution engines.
 
-% With the power of Triton we have a way to maintain a symbolic state of the program.
+\subsubsection{Dynamic Instrumentation and Constraints Collection}
 
-\subsubsection{Dynamic Constraints Collection}
-
-A key component of concolic execution is dynamic constraints collection, which is performed using a concrete executor that runs a program with specific inputs and collects constraints on those inputs.
+A key component of concolic execution is the collection of runtime program data that is used to build a symbolic state. This process is performed using a concrete executor that runs a program with specific inputs and collects constraints on those inputs.
 
 To accomplish this, dynamic binary instrumentation (DBI) frameworks are commonly employed. DBI frameworks allow for program instrumentation and constraint collection on-the-fly, providing a convenient solution to perform dynamic analysis. Popular DBI frameworks, such as Pin \cite{pintool-2005}, DynamoRIO \cite{dynamorio-thesis}, and QEMU \cite{qemu-usenix2005} can be used for this purpose.
 
-Typically, per-instruction callbacks are used in DBI frameworks to collect constraints as the program is executed. When a callback is triggered, the corresponding instruction is examined, and the constraints on the input values are collected. These constraints are then combined to form a path condition that represents all the constraints encountered during execution.
+Typically, to analyze the program's state as it is executed, per-instruction callbacks are used. When a callback is triggered, the corresponding instruction is examined, and the constraints on the input values are built. These constraints are then combined to form a path condition that represents all the constraints encountered during execution.
 
 With the constraints collected, we can now solve them and generate new inputs.
 
 \subsubsection{Constraints Solving}
 
-To solve the constraints collected during dynamic analysis, a constraint solver is needed. The solver takes the path condition generated from the collected constraints and generates new input values that satisfy the condition. To solve the constraints, a wide range of SMT solvers can be employed, such as Z3 \cite{z3-smt-solver}, Bitwuzla \cite{bitwuza-smt-comp-2020}, CVC5 \cite{cvc5-smt-solver}, and others.
+To solve the constraints collected during symbolic execution, a constraint solver is needed. The solver takes the path condition generated from the collected constraints and generates new input values that satisfy the condition. To solve the constraints, a wide range of SMT solvers can be employed, such as Z3 \cite{z3-smt-solver}, Bitwuzla \cite{bitwuza-smt-comp-2020}, CVC5 \cite{cvc5-smt-solver}, and others.
 
 The efficiency and accuracy of the solver play a crucial role in the performance of concolic execution. In some cases, the solver may not be able to find a solution, or the solution may be too complex and time-consuming to compute. To address these issues, various techniques such as constraint simplification and pruning can be used to simplify the constraints and reduce the solution space.
 
-Once the solver generates new input values, the program can be executed again with the updated inputs, and the process of constraint collection and solving can be repeated. This iterative process continues until all paths have been explored, or until a specific goal, such as reaching a specific code location or triggering a specific vulnerability, is achieved.
+Once the solver generates new input values, the program can be executed again with the updated inputs, and the process of constraint collection and solving can be repeated. This iterative process continues until all paths have been explored, or until a specific goal, such as reaching a specific code location or triggering an error, is achieved.
 
 To illustrate the process of constraint solving, we can use the example from Listing \ref{lst:example4}. In this example, we symbolically executed the \texttt{mul} instruction and generated a constraint on the \texttt{ZF} flag. We can now solve this constraint using the Triton API, as shown in Listing \ref{lst:example5}. The solution to the constraint is \texttt{sym\_eax = 0x1d}, which is the value that would trigger the \texttt{error()} function.
 
@@ -235,13 +227,13 @@ To illustrate the process of constraint solving, we can use the example from Lis
 	\label{lst:example5}
 \end{listing}
 
-\subsubsection{Benefits}
+\subsubsection{Use Cases}
 
-With the ability to symbolically execute a program and generate new inputs that satisfy a specific condition, a few obvious benefits arise.
+With the ability to symbolically execute a program and generate new inputs that satisfy a specific condition, a few obvious use cases arise.
 
-First, we can automatically generate inputs that would open up new paths in the program. This allows us to explore different program states and as a result, test different aspects of the program. This is called \textit{path exploration} and is one of the main benefits that symbolic execution provides.
+First, we can automatically generate inputs that would discover new paths in the program. This allows us to explore different program states and as a result, test different aspects of the program. This is called \textit{path exploration} and is one of the main goals of dynamic symbolic execution.
 
-The second benefit of symbolic execution is the ability to not only explore various execution paths but also to verify security invariants. With this technique, we can analyze whether a particular code location is reachable and if a given condition can be met. By employing this approach, we can identify potential vulnerabilities and evaluate if a particular input can trigger them. For instance, we can examine whether it is possible to generate an input that triggers an out-of-bounds access, as demonstrated in the code example presented in Listing \ref{lst:example6}.
+The second goal of symbolic execution is the ability to not only explore various execution paths but also to verify security invariants. With this technique, we can analyze whether a particular code location is reachable and if a given condition can be met. By employing this approach, we can identify potential bugs and evaluate if a particular input can trigger them. For instance, we can examine whether it is possible to generate an input that triggers an out-of-bounds access, as demonstrated in the code example presented in Listing \ref{lst:example6}.
 
 \begin{listing}[htp]
 	\centering
@@ -258,7 +250,7 @@ void vuln(uint32_t index) {
 	\label{lst:example6}
 \end{listing}
 
-The bug here is obvious -- the \texttt{data} array is only 64 bytes long, but the condition \texttt{index < 74} checks that the index is less than 74. This means that any index greater than 63 would trigger an out-of-bounds write. With automatic security invariant checking, we can check if it is possible to generate such an input that would trigger the vulnerability.
+The bug here is obvious -- the \texttt{data} array is only 64 bytes long, but the condition \texttt{index < 74} checks that the index is less than 74. This means that any index greater than 63 would trigger an out-of-bounds write. With automatic security invariant checking, we can check if it is possible to generate such an input that would trigger the error.
 
 One particular example of a tool that implements this technique is Sydr. In the paper \textit{Symbolic Security Predicates: Hunt Program Weaknesses} \cite{symbolic-security-predicates}, the authors proposed a technique called \textit{symbolic security predicates} that allows for automatic security invariant checking.
 
@@ -290,7 +282,7 @@ As we have seen in the previous sections (\ref{fuzzing:challenges}, \ref{symboli
 
 To overcome the limitations of both techniques, researchers have proposed a hybrid approach called \textit{hybrid fuzzing}. Hybrid fuzzing combines fuzzing and symbolic execution to take advantage of their strengths and mitigate their weaknesses. In this approach, the fuzzer generates inputs and feeds them into the symbolic execution engine. The symbolic execution engine then explores the different paths in the program, thus helping the fuzzer explore new code paths.
 
-The primary benefit of hybrid fuzzing is that it is no longer limited by the fuzzer's inability to generate complex inputs. With the help of symbolic execution, the fuzzer can generate inputs that could pass complex checks and open up new paths in the program, leading to better code coverage and more thorough testing. Additionally, the symbolic execution engine can also help identify potential vulnerabilities by checking security invariants.
+The primary benefit of hybrid fuzzing is that it is no longer limited by the fuzzer's inability to generate complex inputs. With the help of symbolic execution, the fuzzer can generate inputs that could pass complex checks and open up new paths in the program, leading to better code coverage and more thorough testing. Additionally, the symbolic execution engine can also help identify potential program errors by checking security invariants.
 
 \subsubsection{Approaches}
 
@@ -300,9 +292,9 @@ The approach employed by Driller is relatively straightforward. A symbolic execu
 
 \newparagraph{QSym}
 
-QSym was the first "modern", binary-only hybrid fuzzer that showed significant improvements over previous approaches. In the paper \textit{QSYM: A Practical Concolic Execution Engine Tailored for Hybrid Fuzzing} \cite{qsym-usenix2018}, the authors described the design and implementation of QSym. One particularly interesting aspect of QSym is that it uses pintool-based instrumentation to collect the necessary information for the symbolic execution engine. While this approach has some limitations (e.g. only x86 is supported), it allows for a much more efficient implementation because there is no need for the IR translation step.
+QSym was the first "modern", binary-only hybrid fuzzer that showed significant improvements over previous approaches. In the paper \textit{QSYM: A Practical Concolic Execution Engine Tailored for Hybrid Fuzzing} \cite{qsym-usenix2018}, the authors described the design and implementation of QSym. One particularly interesting aspect of QSym is that it uses Pin-based instrumentation to collect the necessary information for the symbolic execution engine. While this approach has some limitations (e.g. only x86 is supported), it allows for a much more efficient implementation because there is no need for the IR translation step.
 
-In addition to using pintool-based instrumentation for efficiency, QSym also incorporates several novel techniques to improve the hybrid fuzzing process. One of these techniques is optimistic constraint solving, which allows QSym to combat the problem of over-constrained paths by solving only part of the constraints.
+In addition to using Pin-based instrumentation for efficiency, QSym also incorporates several novel techniques to improve the hybrid fuzzing process. One of these techniques is optimistic constraint solving, which allows QSym to combat the problem of over-constrained paths by solving only part of the constraints.
 
 Another technique implemented in QSym is unrelated constraint elimination. This technique removes constraints that are deemed unrelated to the current path condition. This approach is particularly useful for reducing the number of constraints that need to be solved by the SMT solver, thus improving performance.
 
@@ -310,21 +302,21 @@ The combination of these techniques and the concurrent input generation approach
 
 \newparagraph{SymCC}
 
-SymCC presented a compilation-based approach to symbolic execution that aims to address the issue of speed, which has been a major hurdle to practical symbolic execution. In the paper \textit{Symbolic execution with SymCC: Don't interpret, compile!} \cite{symcc-usenix-2020}, the authors describe how they implemented SymCC, an LLVM-based C and C++ compiler that incorporates concolic execution into the binary. By integrating concolic execution into the resulting binary, SymCC can achieve much better performance than previous approaches, such as QSym.
+SymCC presented a compilation-based approach to symbolic execution that aims to address the issue of speed, which has been a major hurdle to practical symbolic execution. In the paper \textit{Symbolic execution with SymCC: Don't interpret, compile!} \cite{symcc-usenix-2020}, the authors describe how they implemented SymCC, an LLVM-based C and C++ compiler that incorporates concolic execution into the binary during compilation. By integrating concolic execution into the resulting binary, SymCC can achieve much better performance than previous approaches, such as QSym.
 
 While this method greatly improved the performance of symbolic execution, it also introduced some limitations. The most obvious one is that it requires recompiling the program with SymCC, which is not always possible. Nevertheless, the combination of SymCC and AFL has proven to be highly effective in practice.
 
 \newparagraph{SymQEMU}
 
-SymQEMU is another compilation-based symbolic execution tool for binaries, which is similar to SymCC. However, SymQEMU uses dynamic binary translation to instrument the binary, whereas SymCC uses LLVM-based compilation. This means that SymQEMU does not require recompiling the program like SymCC, making it more practical for use on pre-existing binaries.
+SymQEMU is another compilation-based symbolic execution tool for binaries, which is similar to SymCC. However, SymQEMU uses QEMU-based dynamic binary translation to instrument the binary, whereas SymCC uses LLVM-based compilation. This means that SymQEMU does not require recompiling the program like SymCC, making it more practical for use on pre-existing binaries.
 
-In the paper \textit{SymQEMU: Compilation-based symbolic execution for binaries} \cite{symqemu-ndss-2021}, the authors describe how they implemented SymQEMU and evaluated its performance as a hybrid fuzzer in combination with AFL. They found that SymQEMU, when combined with AFL, outperforms previous approaches to hybrid fuzzing, including SymCC + AFL and QEMU-based fuzzers such as Driller and QSYM.
+In the paper \textit{SymQEMU: Compilation-based symbolic execution for binaries} \cite{symqemu-ndss-2021}, the authors describe how they implemented SymQEMU and evaluated its performance as a hybrid fuzzer in combination with AFL++. They found that SymQEMU, when combined with AFL++, either matches or outperforms previous approaches to hybrid fuzzing, such as SymCC + AFL++ and QSYM + AFL.
 
 \newparagraph{Fuzzolic}
 
 At the same time, as SymQEMU paper was published, another paper \textit{FUZZOLIC: Mixing Fuzzing and Concolic Execution} \cite{fuzzolic-hybrid-fuzzer} was also published which proposed a hybrid fuzzer called Fuzzolic. Fuzzolic is built on top of the binary translator QEMU, offering significant benefits in terms of performance and versatility compared to the QSYM concolic executor. The authors also proposed an approximate solver called FUZZY-SAT \cite{fuzzy-sat-fuzzing-symbolic-expressions}, which borrows techniques from the fuzzing domain and provides an alternative to accurate but expensive SMT solving techniques.
 
-Besides the approximate solver, Fuzzolic is also the first to change the classic architecture of concolic engines. Instead of implementing a tracer and the solver as a single component, Fuzzolic decouples them into two separate components. This allows Fuzzolic to overcome one of the major problems affecting QSYM, which is the inability to use external libraries such as SMT solvers due to the limitations of recent releases of most dynamic binary translation frameworks. By separating the tracer and solver components into distinct processes, Fuzzolic can avoid this issue and ensure compatibility with future changes in DBT frameworks.
+Besides the approximate solver, Fuzzolic has also changed the classic architecture of concolic engines. Instead of implementing a tracer and the solver as a single component, Fuzzolic decouples them into two separate components. This allows Fuzzolic to overcome one of the major problems affecting QSYM, which is the inability to use external libraries such as SMT solvers due to the limitations of recent releases of most dynamic binary translation frameworks. By separating the tracer and solver components into distinct processes, Fuzzolic can avoid this issue and ensure compatibility with future changes in DBT frameworks.
 
 Currently, Fuzzolic is one of the most advanced hybrid fuzzers in terms of performance and versatility. However, it is still in its early stages of development. Nevertheless, it is a promising approach that could potentially become the state-of-the-art solution for hybrid fuzzing.
 
@@ -336,6 +328,6 @@ Sydr employs a range of state-of-the-art techniques to enhance the performance o
 
 An interesting feature of Sydr is the integration of security invariant checking into its symbolic execution engine, known as "security predicates". This enables Sydr to identify possible security vulnerabilities in a program by checking for violations of security invariants during symbolic execution.
 
-Sydr is one of the key components of the Sydr-fuzz \cite{sydr-fuzz-ispras-2022} dynamic analysis tool that enables the combination of Sydr with other tools such as AFL++ or LibFuzzer, making hybrid fuzzing possible.
+Sydr is one of the key components of the sydr-fuzz \cite{sydr-fuzz-ispras-2022} dynamic analysis tool that enables the combination of Sydr with other tools such as AFL++ or LibFuzzer, making hybrid fuzzing possible.
 
-In this thesis, we will focus on the Sydr and Sydr-fuzz tools as targets for our proposed improvements.
+In this thesis, I will focus on the Sydr and sydr-fuzz tools as targets for our proposed improvements.

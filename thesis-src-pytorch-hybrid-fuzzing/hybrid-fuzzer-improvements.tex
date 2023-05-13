@@ -1,69 +1,69 @@
 \section{Hybrid Fuzzer Improvements}
 
-During the fuzzing of the PyTorch, we identified several drawbacks of our hybrid fuzzing solution. In this section, we aim to address these issues to improve the overall performance of the \textit{sydr-fuzz}.
+During the fuzzing of the PyTorch, several drawbacks of the hybrid fuzzing solution have been identified. In this section, the objective is to address these concerns with the aim of enhancing the overall performance of the \textit{sydr-fuzz} framework.
 
 \subsection{Scheduling Symbolic Pointers Modeling}
 
-Almost any program written in C/C++ uses pointer operations, thus if we want to have a precise symbolic model of the program, we need to model pointers as well. However, as we have already discussed in section \ref{symbolic_execution:challenges:symbolic_memory}, modeling symbolic pointers is a very computationally expensive process. Nevertheless, it is required to find new paths in the program, that would otherwise be unreachable.
+Almost any program written in C/C++ uses pointer operations, which necessitates the modeling of pointers for a precise symbolic representation of the program. However, as was already discussed in section \ref{symbolic_execution:challenges:symbolic_memory}, modeling symbolic pointers is a very computationally expensive process. Nevertheless, it is required to find new paths in the program, that would otherwise be unreachable.
 
-The same applies to PyTorch. It uses pointers extensively, and thus we need to model them to achieve maximum testing completeness. In fact, we have noticed that symbolic pointer modeling is required for almost any project under test.
+The same applies to PyTorch. It uses pointers extensively, and thus it is required to model them to achieve maximum testing completeness. In fact, it has been observed that symbolic pointer modeling is necessary for almost any project under examination.
 
 \subsubsection{Problem Statement}
 
-With that being said, we can not simply disable symbolic pointer modeling, as it would prevent us from finding new paths in the program, and thus degrade the overall testing completeness. On the other hand, we can not enable it all the time, as it would significantly slow down the fuzzing process.
+With that being said, it is impossible to simply disable symbolic pointer modeling, as it would prevent finding new paths in the program, and thus degrade the overall testing completeness. On the other hand, it is not feasible to enable it all the time, as it would significantly slow down the fuzzing process.
 
-So, we would like to develop a scheduling strategy, that would allow us to achieve the maximum possible code coverage, without sacrificing performance.
+So, the objective is to devise a scheduling strategy, that allows to achieve the maximum possible code coverage, without sacrificing performance.
 
-A scheduling strategy in this context is a mechanism that should allow us to run sydr with memory modeling enabled only when we would benefit from it the most.
+In this context, a scheduling strategy refers to a mechanism that enables running Sydr with memory modeling enabled only when it provides the most significant advantages.
 
 \subsubsection{Proposed Solution}
 
-To do so we have implemented a simple, yet effective scheduling strategy, which executes sydr with memory modeling enabled once in N runs.
+To accomplish this, a straightforward yet efficient scheduling strategy has been implemented, whereby Sydr with memory modeling enabled is executed once in every N runs.
 
-This strategy "exploits" how caching mechanism works for already traversed branches. By allowing sydr to execute multiple times before running it with memory modeling enabled, we allow the cache to saturate with the branches that are not dependent on the symbolic pointers. This way, when we finally run sydr with memory modeling enabled, it will be able to reuse most of the results from previous runs, having to perform the expensive symbolic pointers modeling only for a small portion of new branches. This significantly improves the performance of the symbolic pointer modeling, allowing us to find new paths in the program, while still maintaining a reasonable execution time.
+This strategy "exploits" how caching mechanism works for already traversed branches. By allowing Sydr to execute multiple times before running it with memory modeling enabled, the cache saturates with the branches that are not dependent on the symbolic pointers. This way, when Sydr is eventually executed with memory modeling enabled, it will be able to reuse most of the results from previous runs, having to perform the expensive symbolic pointers modeling only for a small portion of new branches. This significantly improves the performance of the symbolic pointer modeling, enabling the discovery of new paths in the program, while still maintaining a reasonable execution time.
 
 \subsubsection{Experimental Evaluation}
 
-After we have implemented the scheduling strategy, we had to find the optimal value of N. The value of N should be large enough to not significantly degrade the overall performance of the hybrid fuzzer, and at the same time allow the cache to saturate. But it should not be too large, as it would prevent us from finding new paths in the program.
+After implementing the scheduling strategy, the optimal value of N had to be determined. The value of N should be large enough to not significantly degrade the overall performance of the hybrid fuzzer, and at the same time allow the cache to saturate. However, it should not be excessively large, as this would hinder the discovery of new paths in the program.
 
-To find the best value of N, we have conducted multiple experiments using the \textit{FuzzBench} benchmarking platform \cite{fuzzbench-2021}. The results of these experiments are discussed in section \ref{results:symbolic-pointers-modeling-scheduling}.
+To determine the optimal value of N, multiple experiments were conducted using the \textit{FuzzBench} benchmarking platform \cite{fuzzbench-2021}. The results of these experiments are discussed in section \ref{results:symbolic-pointers-modeling-scheduling}.
 
-Based on the results of these experiments, we have decided to use N=25 as the default value for the scheduling strategy implemented in \textit{sydr-fuzz}.
+Based on the outcomes of these experiments, the decision was made to set N=25 as the default value for the scheduling strategy implemented in \textit{sydr-fuzz}.
 
-We have also introduced a new configuration parameter called \texttt{symaddr}, which enables users to customize the number of runs performed between symbolic pointer modeling runs. This parameter can be used to fine-tune the performance of the \textit{sydr-fuzz} for a specific target.
+A new configuration parameter called \texttt{symaddr} has been introduced, allowing users to customize the number of runs performed between symbolic pointer modeling runs. This parameter can be used to fine-tune the performance of the \textit{sydr-fuzz} for a specific target.
 
 \subsection{Enhancing Security Invariants Checking Mechanism} \label{hybrid-fuzzer-improvements:optimizing-security-predicates}
 
-The next issue we have identified during the fuzzing of the PyTorch is related to the security predicates mechanism. As we have mentioned in section \ref{hybrid-fuzzing:sydr}, \textit{sydr} has a mechanism that allows it to check for various security invariants violations, such as buffer overflows, null pointer dereferences, integer overflows, and others. Unfortunately, security predicates often tend to produce false positives. That is why \textit{sydr-fuzz} implements automatic verification of security predicates results.
+The next that was identified during the fuzzing of the PyTorch is related to the security predicates mechanism. As was already mentioned in section \ref{hybrid-fuzzing:sydr}, \textit{Sydr} has a mechanism that allows it to check for various security invariants violations, such as buffer overflows, null pointer dereferences, integer overflows, and others. Unfortunately, security predicates often tend to produce false positives. That is why \textit{sydr-fuzz} implements automatic verification of security predicates results.
 
 \subsubsection{Security Predicates - Violations Verification}
 
 To verify that the bug is real, \textit{sydr-fuzz} executes the target program built with sanitizers, on the input generated by \textit{security predicates} mechanism. When a sanitizer reports an error in the same location that was identified as the error source by security predicates, the bug is considered to be verified. In other words, if the error is detected in the expected location, it confirms that the security predicates accurately captured the potential vulnerability and that the input seed triggered the vulnerability.
 
-To perform the validation, \textit{sydr-fuzz} needs to symbolize \textit{sydr}'s log file, which contains the information about the location of the error. Originally, \textit{sydr-fuzz} used a Python script that relied on \textit{addr2line} and \textit{objdump} tools to perform this operation. However, we have found that this step can be time-consuming and negatively impact the overall performance of the hybrid fuzzer. That is why we have decided to optimize the performance of this step by reimplementing it in Rust. This allowed us to significantly improve the performance of the verification process.
+To perform the validation, \textit{sydr-fuzz} needs to symbolize \textit{Sydr}'s log file, which contains the information about the location of the error. Originally, \textit{sydr-fuzz} used a Python script that relied on \textit{addr2line} and \textit{objdump} tools to perform this operation. However, it was discovered that this step is highly time-consuming and negatively impacts the overall performance of the hybrid fuzzer. That is why the decision was made to optimize the performance of this step by implementing it in Rust. This optimization resulted in a significant improvement in the performance of the verification process.
 
 \subsubsection{Utilizing Debug Information to Improve Annotation Speed}
 
-Before we could start rewriting the annotation script, we had to understand how the debug information is stored and how we could work with it from Rust.
+Before the development of the module could start, it was necessary to gain a comprehensive understanding of how the debug information is stored and how it could be interacted with from Rust.
 
 \newparagraph{DWARF Debug Information Format}
 
 The DWARF debugging information format is a standard way to store debugging information in object files. It is used by many compilers and debuggers, including \textit{GCC}, \textit{Clang}, and others. The DWARF format is designed to be extensible, efficient, and language-independent. It uses a series of data structures to describe the program in a way that is both human-readable and machine-readable. Debug information can be used to partially reconstruct the source code, even when only the binary file is available. By leveraging this information, it is possible to recover variable names, file names, function names, and other important entities that were present in the original code.
 
-That is precisely the information that is required for the annotation process. With its help, we can recover the function names and line numbers from the addresses listed in the \textit{sydr}'s log file. This allows us to compare the output of the sanitized binary with the information from the \textit{sydr}'s log file, and thus verify the violation.
+That is precisely the information that is required for the annotation process. With its help, it is possible to recover the function names and line numbers from the addresses listed in the \textit{Sydr}'s log file. This allows for the comparison of the output of the sanitized binary with the information from the \textit{Sydr}'s log file, thus enabling the verification of the violation.
 
 \newparagraph{Rust Implementation}
 
-To implement the annotation process in Rust, we have developed a \textit{dbginfo} module, which is responsible for parsing the DWARF debug information using the \textit{gimli} and \textit{addr2line} crates. The \textit{dbginfo} is then used by the \textit{annotate} module, which is responsible for the annotation process itself.
+To implement the annotation process in Rust, a \textit{dbginfo} module was developed, responsible for parsing the DWARF debug information using the \textit{gimli} and \textit{addr2line} crates. The \textit{dbginfo} is then used by the \textit{annotate} module, which is responsible for the annotation process itself.
 
-To make the annotation process efficient, we have implemented an in-memory caching mechanism that avoids parsing the debug information for the same binary multiple times. This caching approach significantly improves the performance of the annotation process by reusing parsed debug information across multiple calls to the \mintinline{rust}{annotate_log(log_path, annotated_path)} function.
+To make the annotation process efficient, an in-memory caching mechanism was implemented to prevent parsing the debug information for the same binary more than once. This caching approach significantly improves the performance of the annotation process by reusing parsed debug information across multiple calls to the \mintinline{rust}{annotate_log(log_path, annotated_path)} function.
 
 \subsubsection{Experimental Evaluation}
 
-After we have implemented a new solution we executed multiple benchmarks to evaluate its performance. In Section \ref{results:security-invariants-enchantment-log-annotation}, we discuss the findings of these experiments and provide insights into the effectiveness and efficiency of our approach.
+After implementing the new solution, multiple benchmarks were executed to evaluate its performance. The findings of these experiments and insights into the effectiveness and efficiency of the approach are discussed in Section \ref{results:security-invariants-enhancement-log-annotation}.
 
 % The speedup to annotate \textit{branch trace}s was measured to be up to 99.95 \% faster. The annotation speed for \textit{instruction trace}s was on the same level measuring up to 99.13 \% speed increase.
 
-Our measurements showed that the annotation process for \textit{branch traces} was up to 99.97\% faster, while the annotation speed for \textit{instruction traces} showed a comparable improvement of up to 99.13\%.
+The measurements showed that the annotation process for \textit{branch traces} was up to 99.97\% faster, while the annotation speed for \textit{instruction traces} showed a comparable improvement of up to 99.13\%.
 
 % These performance gains demonstrate the effectiveness of our optimization approach in accelerating the analysis of both types of traces.
