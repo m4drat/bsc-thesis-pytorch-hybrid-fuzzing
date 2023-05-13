@@ -126,14 +126,14 @@ One particularly challenging problem is the generation of inputs that satisfy co
 	\centering
 	\begin{minipage}{.6\linewidth}
 		\begin{minted}[linenos=true, tabsize=4]{c}
-void vuln(int key) {
-	if (key * 0xa9a57b == 0x1337beef) {
-		error();
+void bug(uint32_t val) {
+	if (val * 0xa9a57b == 0x1337beef) {
+		crash();
 	}
 }
 		\end{minted}
 	\end{minipage}
-	\caption{Example solvable by symbolic execution}
+	\caption{Example with complex constraints}
 	\label{lst:example3}
 \end{listing}
 
@@ -145,7 +145,7 @@ Symbolic interpretation, also known as symbolic execution, is another dynamic an
 
 Essentially, symbolic execution is a powerful technique that runs the program with symbolic inputs instead of concrete ones. By treating program states as sets of constraints on these inputs, we can systematically explore different paths through the code and generate new test cases that can reveal hidden bugs.
 
-For example, the state of the program in Listing \ref{lst:example3} can be defined by this equation: \mintinline{python}{key * 0xa9a57b = 0x1337beef}. Depending on whether this equation is satisfied or not, we either take the \texttt{true} or the \texttt{false} branch. By solving this equation, we can generate an input that would open up the \texttt{true} branch, and thus trigger the \texttt{error()} function. For this particular example, the input \mintinline{python}{0x1337beef / 0xa9a57b = 0x1d} would satisfy the equation and trigger the error. What is notable, for classic fuzzers, it would require exhaustively testing all possible inputs to find this one, as there is no feedback that would guide the fuzzer toward this input.
+For example, the state of the program in Listing \ref{lst:example3} can be defined by this equation: \mintinline{python}{val * 0xa9a57b = 0x1337beef}. Depending on whether this equation is satisfied or not, we either take the \texttt{true} or the \texttt{false} branch. By solving this equation, we can generate an input that would open up the \texttt{true} branch, and thus trigger the \texttt{error()} function. For this particular example, the input \mintinline{python}{0x1337beef / 0xa9a57b = 0x1d} would satisfy the equation and trigger the error. What is notable, for classic fuzzers, it would require exhaustively testing all possible inputs to find this one, as there is no feedback that would guide the fuzzer toward this input.
 
 Now that we have covered the fundamentals of symbolic execution, let us delve deeper into the various components of the symbolic execution process.
 
