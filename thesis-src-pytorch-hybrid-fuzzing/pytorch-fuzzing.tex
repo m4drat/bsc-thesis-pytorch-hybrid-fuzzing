@@ -113,7 +113,7 @@ The first two functions are related to the JIT module and are responsible for pa
 
 The last two functions are related to the RPC module and are responsible for deserializing RPC requests and responses. These functions are interesting because they are directly processing untrusted data that is received from the network.
 
-Besides that, another interesting function - \\ \texttt{jit::preoptimizeGraph}, has been identified within the JIT module. It has been chosen as a target for differential fuzzing, with the objective of uncovering bugs associated with JIT graph optimizations.
+Besides that, another interesting function - \texttt{jit::preoptimizeGraph}, has been identified within the JIT module. It has been chosen as a target for differential fuzzing, with the objective of uncovering bugs associated with JIT graph optimizations.
 
 \subsection{Preparing PyTorch for Fuzzing}
 

@@ -34,7 +34,7 @@ A new configuration parameter called \texttt{symaddr} has been introduced, allow
 
 \subsection{Enhancing Security Invariants Checking Mechanism} \label{hybrid-fuzzer-improvements:optimizing-security-predicates}
 
-The next that was identified during the fuzzing of the PyTorch is related to the security predicates mechanism. As was already mentioned in section \ref{hybrid-fuzzing:sydr}, \textit{Sydr} has a mechanism that allows it to check for various security invariants violations, such as buffer overflows, null pointer dereferences, integer overflows, and others. Unfortunately, security predicates often tend to produce false positives. That is why \textit{sydr-fuzz} implements automatic verification of security predicates results.
+The next issue that was identified during the fuzzing of the PyTorch is related to the security predicates mechanism. As was already mentioned in section \ref{hybrid-fuzzing:sydr}, \textit{Sydr} has a mechanism that allows it to check for various security invariants violations, such as buffer overflows, null pointer dereferences, integer overflows, and others. Unfortunately, security predicates often tend to produce false positives. That is why \textit{sydr-fuzz} implements automatic verification of security predicates results.
 
 \subsubsection{Security Predicates - Violations Verification}
 

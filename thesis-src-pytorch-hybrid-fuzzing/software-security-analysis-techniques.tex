@@ -250,7 +250,7 @@ void vuln(uint32_t index) {
 	\label{lst:example6}
 \end{listing}
 
-The bug here is obvious -- the \texttt{data} array is only 64 bytes long, but the condition \texttt{index < 74} checks that the index is less than 74. This means that any index greater than 63 would trigger an out-of-bounds write. With automatic security invariant checking, we can check if it is possible to generate such an input that would trigger the error.
+The bug here is obvious -- the \texttt{data} array is only 64 bytes long, but the condition \texttt{index < 74} checks that the index is less than 74. This means that any index greater than 63 would trigger an out-of-bounds write. With automatic security invariant checking, we can check whether it is possible to generate such an input that would trigger the error.
 
 One particular example of a tool that implements this technique is Sydr. In the paper \textit{Symbolic Security Predicates: Hunt Program Weaknesses} \cite{symbolic-security-predicates}, the authors proposed a technique called \textit{symbolic security predicates} that allows for automatic security invariant checking.
 
