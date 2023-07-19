@@ -49,6 +49,12 @@
     ],
     "latex-workshop.latex.recipes": [
         {
+            "name": "xelatex",
+            "tools": [
+                "xelatex"
+            ]
+        },
+        {
             "name": "pdflatex ➞ bibtex ➞ pdflatex`×2",
             "tools": [
                 "pdflatex",
@@ -67,12 +73,6 @@
             "name": "latexmk 🔃",
             "tools": [
                 "latexmk"
-            ]
-        },
-        {
-            "name": "xelatex",
-            "tools": [
-                "xelatex"
             ]
         },
         {
